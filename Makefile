@@ -7,10 +7,14 @@ DAEMONIZE=--daemonize /tmp/wirtualbox.log
 NOLOG=--disable-logging
 
 
-
 debug:
 	$(UWSGI) $(PIDFILE) $(STATICMAP) --psgi app.pl
 run:
 	$(UWSGI) $(PIDFILE) $(STATICMAP) --psgi app.pl $(DAEMONIZE)
 kill:
 	kill -9 `cat /tmp/wirtualbox.pid` ; rm /tmp/wirtualbox.log
+getbootstrap:
+	rm htdocs/bootstrap-4.3.1-dist.zip ; \
+	wget -O htdocs/bootstrap-4.3.1-dist.zip https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip && \
+	cd htdocs && \
+	unzip bootstrap-4.3.1-dist.zip

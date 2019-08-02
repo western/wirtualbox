@@ -16,3 +16,5 @@ fi
 
 
 zypper in -y uwsgi-psgi uwsgi
+
+cpan HTTP::Entity::Parser
