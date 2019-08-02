@@ -50,10 +50,14 @@ my $app = sub {
         ];
     }
     
-    if( my $file1 = $r->param('file1') ){
-        print 'file1='.dumper($file1);
+    if( my $file = $r->param('file2') ){
         
-        $r->upload_to('file1', '/tmp/file_tmp');
+        print 'file2='.dumper($file);
+        
+        $file->upload_to(
+            full_path => '/tmp/filename.'.$file->ext,
+            rewrite => 1,
+        );
     }
     
     return [
@@ -75,6 +79,7 @@ my $app = sub {
                     <input type="hidden" name="hid2" value="val2">
                     <input type="hidden" name="hid2" value="val3">
                     <input type="file" name="file1" >
+                    <input type="file" name="file2" >
                     <input type="submit" value="!Clickme 2">
                 </form>
                 
