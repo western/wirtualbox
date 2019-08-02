@@ -1,0 +1,10 @@
+
+WIRTUALBOX
+================================================================================
+
+1. RUN
+--------------------------------------------------------------------------------
+1.1 by default "make" or "make debug"
+1.2 "make run" - start production version with logging and pid write
+1.3 "make kill" - stop production version
+
