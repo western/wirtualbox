@@ -34,6 +34,16 @@ sub path_info{
     $o->{env} && $o->{env}{PATH_INFO} ? $o->{env}{PATH_INFO} : undef;
 }
 
+sub http_referer{
+    my $o = shift;
+    $o->{env} && $o->{env}{HTTP_REFERER} ? $o->{env}{HTTP_REFERER} : undef;
+}
+
+sub request_method{
+    my $o = shift;
+    $o->{env} && $o->{env}{REQUEST_METHOD} ? $o->{env}{REQUEST_METHOD} : undef;
+}
+
 sub _param_parse{
     my $o = shift;
     
@@ -42,6 +52,8 @@ sub _param_parse{
     if( $o->{env} && $o->{env}{REQUEST_METHOD} eq 'GET' && length $o->{env}{QUERY_STRING} ){
         my $param = $o->{param} = [];
         my $charset = $o->charset;
+        
+        print "_GET_parse\n";
         
         for my $pair (split '&', $o->{env}{QUERY_STRING}) {
             next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
@@ -74,7 +86,7 @@ sub _param_parse{
         $parser->register('multipart/form-data', 'HTTP::Entity::Parser::MultiPart');
         
         if( my(@args) = $parser->parse($o->{env}) ){
-            print 'parser_dumper='.dumper(\@args);
+            #print 'parser_dumper='.dumper(\@args);
             
             $o->{param} = [@{$args[0]}, @{$args[1]}];
         }
@@ -86,11 +98,13 @@ sub param{
     my $o = shift;
     my $name = shift;
     
-    print '1. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
+    
+    
+    #print '1. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
     
     $o->_param_parse if !$o->{param};
     
-    print '2. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
+    #print '2. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
     
     my @values;
     my $param = $o->{param} || [];
@@ -98,7 +112,37 @@ sub param{
         push @values, $param->[$i + 1] if $param->[$i] eq $name;
     }
     
-    wantarray ? @values : \@values;
+    #print "$$ get param '$name'\n";
+    #print '@values='.dumper(\@values);
+    
+    #wantarray ? @values : \@values;
+    return $values[0] if( scalar @values == 1 );
+    return @values;
+}
+
+sub upload_to{
+    my $o = shift;
+    my $name = shift;
+    my $save_full_name = shift;
+    
+    if( my $info = $o->param($name) ){
+        
+        if( $info->{filename} && $info->{tempname} ){
+            open my $in, '<', $info->{tempname} or die $!;
+            open my $out, '>', $save_full_name or die $!;
+            
+            binmode $in;
+            binmode $out;
+            
+            print $out $_ while(<$in>);
+            
+            close $in;
+            close $out;
+            return 1;
+        }
+    }
+    
+    return 0;
 }
 
 1;

@@ -50,6 +50,12 @@ my $app = sub {
         ];
     }
     
+    if( my $file1 = $r->param('file1') ){
+        print 'file1='.dumper($file1);
+        
+        $r->upload_to('file1', '/tmp/file_tmp');
+    }
+    
     return [
         '200',
         [ 'Content-Type' => 'text/html' ],
@@ -74,8 +80,8 @@ my $app = sub {
                 
                 <br><a href="?n1=value1&n1=value11&n2=value2">!Clickme</a><br>
             ~,
-            'n1='.dumper($r->param('n1')).'<br>',
-            'n2='.dumper($r->param('n2')).'<br>',
+            #'n1='.dumper($r->param('n1')).'<br>',
+            #'n2='.dumper($r->param('n2')).'<br>',
             "<h1>app.pl $$</h1>",
             "<pre>",
             dumper($env),
