@@ -20,7 +20,7 @@ use Wirtualbox::Util qw(dumper);
 
 # Param parser
 # https://metacpan.org/source/Mojo::Parameters
-
+# https://metacpan.org/release/Plack/source/lib/Plack/Request.pm
 
 # /usr/sbin/uwsgi --plugins http,psgi --http :8090 --http-modifier1 5 --psgi app.pl
 # /usr/sbin/uwsgi --plugins http,psgi --http :8090 --http-modifier1 5 --enable-threads --processes=10 --master --static-map /js=htdocs/js --psgi app.pl
@@ -33,8 +33,7 @@ use Wirtualbox::Util qw(dumper);
 my $app = sub {
     my $env = shift;
     
-    #my $in = $env->{'psgi.input'};
-    #my $err = $env->{'psgi.errors'};
+    
     my $r = new Wirtualbox::Request(env => $env);
     
     
@@ -56,11 +55,21 @@ my $app = sub {
         [ 'Content-Type' => 'text/html' ],
         [ 
             q~
-                <form method=post _enctype="multipart/form-data">
+                <form method=post >
                     <input type="hidden" name="hid1" value="val1">
                     <input type="hidden" name="hid2" value="val2">
                     <input type="hidden" name="hid2" value="val3">
                     <input type="submit" value="!Clickme">
+                </form>
+                
+                <hr>
+                
+                <form method=post enctype="multipart/form-data">
+                    <input type="hidden" name="hid1" value="val1">
+                    <input type="hidden" name="hid2" value="val2">
+                    <input type="hidden" name="hid2" value="val3">
+                    <input type="file" name="file1" >
+                    <input type="submit" value="!Clickme 2">
                 </form>
                 
                 <br><a href="?n1=value1&n1=value11&n2=value2">!Clickme</a><br>

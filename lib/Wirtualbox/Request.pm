@@ -4,6 +4,8 @@ package Wirtualbox::Request;
 use strict;
 use warnings;
 
+use HTTP::Entity::Parser;
+
 use Wirtualbox::Util qw(dumper url_unescape decode);
 
 
@@ -37,7 +39,7 @@ sub _param_parse{
     
     print "_param_parse\n";
     
-    if( $o->{env} && $o->{env}{REQUEST_METHOD} && $o->{env}{REQUEST_METHOD} eq 'GET' && length $o->{env}{QUERY_STRING} ){
+    if( $o->{env} && $o->{env}{REQUEST_METHOD} eq 'GET' && length $o->{env}{QUERY_STRING} ){
         my $param = $o->{param} = [];
         my $charset = $o->charset;
         
@@ -55,17 +57,40 @@ sub _param_parse{
             push @$param, $name, $value;
         }
     }
+    
+    if( $o->{env} && $o->{env}{REQUEST_METHOD} eq 'POST' ){
+        
+        print "_POST_parse\n";
+        
+        my $length = 0;
+        if ($o->{env}{'psgix.input.buffered'}) {
+            $length = 1024 * 1024; # 1MB for buffered
+        } else {
+            $length = 1024 * 64; # 64K for unbuffered
+        }
+        
+        my $parser = HTTP::Entity::Parser->new(buffer_length => $length);
+        $parser->register('application/x-www-form-urlencoded', 'HTTP::Entity::Parser::UrlEncoded');
+        $parser->register('multipart/form-data', 'HTTP::Entity::Parser::MultiPart');
+        
+        if( my(@args) = $parser->parse($o->{env}) ){
+            print 'parser_dumper='.dumper(\@args);
+            
+            $o->{param} = [@{$args[0]}, @{$args[1]}];
+        }
+        
+    }
 }
 
 sub param{
     my $o = shift;
     my $name = shift;
     
-    print '1. pid='.$$.' '.$o->path_info.' '.dumper($o->{param});
+    print '1. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
     
     $o->_param_parse if !$o->{param};
     
-    print '2. pid='.$$.' '.$o->path_info.' '.dumper($o->{param});
+    print '2. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
     
     my @values;
     my $param = $o->{param} || [];

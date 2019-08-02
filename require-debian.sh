@@ -3,8 +3,8 @@
 # check system libs for required
 
 if ! whoami | grep -q root; then
-    #echo 'root required. exit.'
-    #exit 1
+    echo 'root required. exit.'
+    exit 1
 fi
 
 if cat /etc/*release* | grep -q 'VERSION="9 (stretch)"'; then
