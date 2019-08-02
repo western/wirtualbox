@@ -5,7 +5,7 @@ Web interface for Virtualbox
 
 0. Check required
 --------------------------------------------------------------------------------
-0.1 run ./require-[YOUR_LINUX].sh for test
+0.1 run bin/require-[YOUR_LINUX].sh for test
 
 1. RUN
 --------------------------------------------------------------------------------
