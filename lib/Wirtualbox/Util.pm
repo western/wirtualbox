@@ -1,5 +1,5 @@
 
-package Util;
+package Wirtualbox::Util;
 
 use strict;
 use warnings;

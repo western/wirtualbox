@@ -1,10 +1,10 @@
 
-package Request;
+package Wirtualbox::Request;
 
 use strict;
 use warnings;
 
-use Util qw(dumper url_unescape decode);
+use Wirtualbox::Util qw(dumper url_unescape decode);
 
 
 

@@ -5,8 +5,8 @@ use warnings;
 use utf8;
 
 use lib 'lib';
-use Request;
-use Util qw(dumper);
+use Wirtualbox::Request;
+use Wirtualbox::Util qw(dumper);
 
 
 # PSGI — интерфейс между web-серверами и web-приложениями на perl
@@ -35,7 +35,7 @@ my $app = sub {
     
     #my $in = $env->{'psgi.input'};
     #my $err = $env->{'psgi.errors'};
-    my $r = new Request(env => $env);
+    my $r = new Wirtualbox::Request(env => $env);
     
     
     
