@@ -22,11 +22,6 @@ sub new{
     bless $o, $class;
 }
 
-sub env{
-    my $o = shift;
-    $o->{env};
-}
-
 sub charset{
     my $o = shift;
     $o->{charset};
@@ -66,9 +61,11 @@ sub param{
     my $o = shift;
     my $name = shift;
     
+    print '1. pid='.$$.' '.$o->path_info.' '.dumper($o->{param});
+    
     $o->_param_parse if !$o->{param};
     
-    #print dumper($o->{param});
+    print '2. pid='.$$.' '.$o->path_info.' '.dumper($o->{param});
     
     my @values;
     my $param = $o->{param} || [];

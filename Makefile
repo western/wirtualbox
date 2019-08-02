@@ -1,5 +1,5 @@
 
-UWSGI=/usr/sbin/uwsgi --plugins http,psgi --http :8090 --http-modifier1 5 --enable-threads --processes=5 --master
+UWSGI=/usr/sbin/uwsgi --plugins http,psgi --http :8090 --http-modifier1 5 --enable-threads --processes=2 --master
 CHKSTATIC=--check-static htdocs
 STATICMAP=--static-map /js=htdocs/js --static-map /favicon.ico=htdocs/favicon.ico
 PIDFILE=--pidfile /tmp/wirtualbox.pid
