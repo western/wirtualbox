@@ -19,3 +19,5 @@ getbootstrap:
 	wget -O bootstrap-4.3.1-dist.zip https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip && \
 	unzip bootstrap-4.3.1-dist.zip && \
 	rm bootstrap-4.3.1-dist.zip
+test:
+	prove
