@@ -4,6 +4,8 @@ package WB::Response;
 use strict;
 use warnings;
 
+use WB::Util qw(dumper);
+
 
 sub new{
     my $c = shift;
@@ -16,6 +18,11 @@ sub new{
         body => [],
         %arg,
     };
+    
+    if( scalar @{$o->{header}} == 0 ){
+        push @{$o->{header}}, ('Content-type', 'text/html');
+        push @{$o->{header}}, ('X-WB', '1');
+    }
     
     bless $o, $class;
 }
@@ -32,16 +39,14 @@ sub header{
     my $name = shift;
     my $value = shift;
     
-    $o->{header} = push @{$o->{header}}, [$name, $value] if ($name);
+    push @{$o->{header}}, ($name, $value) if ($name);
     $o->{header};
 }
 
 sub body{
     my $o = shift;
-    my $name = shift;
-    my $value = shift;
     
-    $o->{body} = push @{$o->{body}}, [$name, $value] if ($name);
+    push @{$o->{body}}, @_ if (@_);
     $o->{body};
 }
 

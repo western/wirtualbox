@@ -5,8 +5,10 @@ use warnings;
 use utf8;
 
 use lib 'lib';
-use Wirtualbox::Request;
-use Wirtualbox::Util qw(dumper);
+#use WB::Request;
+use WB::Router qw(:def);
+#use WB::Util qw(dumper);
+
 
 
 # PSGI — интерфейс между web-серверами и web-приложениями на perl
@@ -30,11 +32,38 @@ use Wirtualbox::Util qw(dumper);
 #--declare-option '$@' --uid=$OWNER --gid=$GROUP --uwsgi-socket=$SOCK.{1..$NUM_SOCK}
 #echo "CHECK COMMAND: " $DAEMON $DAEMON_OPTS
 
+
+=head1
+WB::Router->new(env => 'env-fake-string')->dispatch(
+    #resource 'photo',
+    #resource 'Vector::Info',
+    get {'/vector/info' => 'Vector::Info::index'},
+    #get {'/vector/info/:option' => 'Vector::Info::simple'},
+    get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
+    #get {'/auth' => 'Auth::index'},
+    #post {'/api' => 'Api::post'},
+);
+
+die 'exit';
+=cut
+
+
 my $app = sub {
+    WB::Router->new(env => shift)->dispatch(
+        resource 'photo',
+        get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
+        get {'/vector/info/:option' => 'Vector::Info::simple'},
+        get {'/vector/info' => 'Vector::Info::index'},
+        
+    );
+};
+
+=head1
+my $app2 = sub {
     my $env = shift;
     
     
-    my $r = new Wirtualbox::Request(env => $env);
+    my $r = new WB::Request(env => $env);
     
     
     
@@ -101,3 +130,4 @@ my $xheader = sub {
     push @{$res->[1]}, 'X-PSGI-Used' => 1;
     return $res;
 };
+=cut

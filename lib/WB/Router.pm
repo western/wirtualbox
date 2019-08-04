@@ -4,6 +4,7 @@ package WB::Router;
 use strict;
 use warnings;
 
+
 use WB::Request;
 use WB::Response;
 use WB::Util qw(dumper);
@@ -85,37 +86,25 @@ sub dispatch{
         }
     }
     
-    my $r = new WB::Request(env=>$o->{env});
+    my $req = new WB::Request(env=>$o->{env});
     my $response = new WB::Response(env=>$o->{env});
-    
-    $r->{env} = {
-        REQUEST_METHOD => 'GET',
-        #PATH_INFO => '/vector/info',
-        PATH_INFO => '/vector/info/xx/yy',
-    };
     
     for my $a (@_){
         
         my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
-        #warn '@rx_names='.dumper(\@rx_names);
         
-        if( $r->request_method eq uc $a->[0] && $r->path_info =~ /$a->[1]/ ){
-            
-            # $+{greet}
-            #warn "option=[".$+{option}."]";
-            #warn "option2=[".$+{option2}."]";
-            #warn dumper($+{});
+        if( $req->request_method eq uc $a->[0] && $req->path_info =~ /$a->[1]/ ){
             
             my %rx_args = map { $_ => $+{$_} } @rx_names;
-            #warn '%rx_args='.dumper(\%rx_args);
             
-            $a->[3]->($r, $response, \%rx_args);
+            $a->[3]->($req, $response, \%rx_args);
             last;
         }
     }
     
     #$_[3][3]->();
-    warn dumper \@_;
+    #warn dumper \@_;
+    #warn '$response='.dumper($response);
     
     $response->out;
 }

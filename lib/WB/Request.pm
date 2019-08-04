@@ -44,6 +44,11 @@ sub request_method{
     $o->{env} && $o->{env}{REQUEST_METHOD} ? $o->{env}{REQUEST_METHOD} : undef;
 }
 
+sub remote_addr{
+    my $o = shift;
+    $o->{env} && $o->{env}{REMOTE_ADDR} ? $o->{env}{REMOTE_ADDR} : undef;
+}
+
 sub _param_parse{
     my $o = shift;
     
