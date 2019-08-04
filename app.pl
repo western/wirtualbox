@@ -55,6 +55,9 @@ my $app = sub {
         get {'/vector/info/:option' => 'Vector::Info::simple'},
         get {'/vector/info' => 'Vector::Info::index'},
         
+        
+        post {'/auth/login' => 'Auth::login'},
+        get {'/auth' => 'Auth::index'},
     );
 };
 
