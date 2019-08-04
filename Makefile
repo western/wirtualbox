@@ -19,5 +19,9 @@ getbootstrap:
 	wget -O bootstrap-4.3.1-dist.zip https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip && \
 	unzip bootstrap-4.3.1-dist.zip && \
 	rm bootstrap-4.3.1-dist.zip
+getjquery:
+	cd htdocs/js ; \
+	rm jquery-3.4.1.min.js ; \
+	wget -O jquery-3.4.1.min.js https://code.jquery.com/jquery-3.4.1.min.js
 test:
 	prove
