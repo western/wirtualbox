@@ -13,9 +13,9 @@ use Exporter 'import';
 use Cwd;
 
 our @EXPORT_OK = (
-    qw(resource get post)
+    qw(root resource get post)
 );
-our %EXPORT_TAGS = (def => [qw(resource get post)]);
+our %EXPORT_TAGS = (def => [qw(root resource get post)]);
 
 
 sub new{
@@ -36,12 +36,18 @@ sub dispatch{
     
     
     my @newa;
+    my $root;
     for my $a (@_){
         
+        # for resource
         if( ref $a->[0] eq 'ARRAY' ){
             push @newa, @{$a};
         }else{
-            push @newa, $a;
+            if( $a->[1] eq '/' ){
+                $root = $a;
+            }else{
+                push @newa, $a;
+            }
         }
     }
     
@@ -70,24 +76,53 @@ sub dispatch{
         $a->[3] = sub{ $pack->$func(@_) };
     }
     
-    $o->{env}->{root} = $cwd;
+    $o->{env}{root} = $cwd;
     my $req = new WB::Request(env=>$o->{env});
     my $response = new WB::Response(env=>$o->{env});
     
-    for my $a (@newa){
+    my $found = 0;
+    if( $req->request_method eq 'GET' && $req->path_info eq '/' ){
         
-        my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
+        my @t = split(/::/, $root->[2]);
+        my $func = pop @t;
+        my $pack = join('::', @t);
         
-        if( $req->request_method eq $a->[0] && $req->path_info =~ /$a->[1]/ ){
+        if( scalar @t > 1 ){
+            # Vector::Info::index (for Vector::Info)
+            require $cwd.'/lib/'.join('/', @t).'.pm';
+        }else{
+            # Auth::index (for Controller::Auth)
+            $pack = 'Controller::'.$pack;
+            require $cwd.'/lib/Controller/'.$t[0].'.pm';
+        }
+        
+        $pack->$func($req, $response);
+        $found = 1;
+        
+    }else{
+        
+        for my $a (@newa){
             
-            my %rx_args = map { $_ => $+{$_} } @rx_names;
+            my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
             
-            $a->[3]->($req, $response, \%rx_args);
-            last;
+            if( $req->request_method eq $a->[0] && $req->path_info =~ /^$a->[1]/ ){
+                
+                my %rx_args = map { $_ => $+{$_} } @rx_names;
+                
+                $a->[3]->($req, $response, \%rx_args);
+                $found = 1;
+                last;
+            }
         }
     }
     
+    $response->set404 if !$found;
+    
     $response->out;
+}
+
+sub root($){
+    ['GET', '/', ucfirst $_[0]];
 }
 
 sub resource($){

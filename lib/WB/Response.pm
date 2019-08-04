@@ -50,6 +50,16 @@ sub body{
     $o->{body};
 }
 
+sub set404{
+    my $o = shift;
+    $o->{code} = 404;
+    $o->{body} = [
+        '<h1>404</h1><hr>',
+        $o->{env}{PATH_INFO},
+        ' not found',
+    ];
+}
+
 sub out{
     my $o = shift;
     

@@ -11,12 +11,17 @@ use WB::Router qw(:def);
 
 
 my $app = sub {
-    WB::Router->new(env => shift)->dispatch(
+    
+    WB::Router->new(
+        env => shift,
+    )->dispatch(
+        
+        root 'Page::index',
         resource 'photo',
+        
         get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
         get {'/vector/info/:option' => 'Vector::Info::simple'},
         get {'/vector/info' => 'Vector::Info::index'},
-        
         
         post {'/auth/login' => 'Auth::login'},
         get {'/auth' => 'Auth::index'},
