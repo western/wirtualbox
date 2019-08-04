@@ -34,35 +34,25 @@ sub dispatch{
     my $o = shift;
     my $cwd = getcwd();
     
-    #warn dumper \@_;
     
+    
+    my @newa;
     for my $a (@_){
         
-        # remove last slash
-        #$a->[0] =~ s!/$!!;
-        
-        # resource 'photo'
-        if($a->[0] eq 'resource'){
-            
-            my @t = split(/::/, $a->[2]);
-            my $func = 'index';
-            my $pack = join('::', @t);
-            
-            if( scalar @t > 1 ){
-                require $cwd.'/lib/'.join('/', @t).'.pm';
-            }else{
-                $pack = 'Controller::'.$pack;
-                require $cwd.'/lib/Controller/'.$t[0].'.pm';
-            }
-            
-            warn "pack=[$pack] func=[$func]";
-            
-            $a->[3] = sub{ $pack->$func(@_) };
+        if( ref $a->[0] eq 'ARRAY' ){
+            push @newa, @{$a};
+        }else{
+            push @newa, $a;
         }
+    }
+    
+    
+    
+    for my $a (@newa){
         
         # get /path Vector::Info::index (for Vector::Info)
         # get /path Auth::index (for Controller::Auth)
-        if( $a->[0] eq 'get' || $a->[0] eq 'post' ){
+        #if( $a->[0] eq 'get' || $a->[0] eq 'post' ){
             
             my @t = split(/::/, $a->[2]);
             my $func = pop @t;
@@ -83,13 +73,14 @@ sub dispatch{
             $a->[1] =~ s!:([^/:]+)!\(?<$1>[^/]+\)!g;
             
             $a->[3] = sub{ $pack->$func(@_) };
-        }
+        #}
     }
     
+    $o->{env}->{root} = $cwd;
     my $req = new WB::Request(env=>$o->{env});
     my $response = new WB::Response(env=>$o->{env});
     
-    for my $a (@_){
+    for my $a (@newa){
         
         my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
         
@@ -102,15 +93,25 @@ sub dispatch{
         }
     }
     
-    #$_[3][3]->();
-    #warn dumper \@_;
-    #warn '$response='.dumper($response);
+    
     
     $response->out;
 }
 
 sub resource($){
-    ['resource', '/'.lc $_[0], ucfirst $_[0]];
+    my $arg = shift;
+    my $path = lc $arg;
+    my $pack = ucfirst $arg;
+    
+    [
+        ['get', '/'.$path.'/new', $pack.'::new'],
+        ['post', '/'.$path, $pack.'::create'],
+        ['get', '/'.$path.'/:id', $pack.'::show'],
+        ['get', '/'.$path.'/:id/edit', $pack.'::edit'],
+        ['post', '/'.$path.'/:id', $pack.'::update'],
+        ['get', '/'.$path.'/:id/del', $pack.'::destroy'],
+        ['get', '/'.$path, $pack.'::index'],
+    ];
 }
 
 sub get($){
