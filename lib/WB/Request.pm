@@ -1,13 +1,13 @@
 
-package Wirtualbox::Request;
+package WB::Request;
 
 use strict;
 use warnings;
 
 use HTTP::Entity::Parser;
 
-use Wirtualbox::Util qw(dumper url_unescape decode);
-use Wirtualbox::File;
+use WB::Util qw(dumper url_unescape decode);
+use WB::File;
 
 
 sub new{
@@ -95,7 +95,7 @@ sub _param_parse{
                 my $ar = $args[1][$i+1];
                 
                 push @b, $args[1][$i];
-                push @b, new Wirtualbox::File(
+                push @b, new WB::File(
                     filename => $ar->{filename},
                     size => $ar->{size},
                     tempname => $ar->{tempname},

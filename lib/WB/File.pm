@@ -1,5 +1,5 @@
 
-package Wirtualbox::File;
+package WB::File;
 
 use strict;
 use warnings;
