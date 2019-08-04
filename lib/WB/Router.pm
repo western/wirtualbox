@@ -35,7 +35,6 @@ sub dispatch{
     my $cwd = getcwd();
     
     
-    
     my @newa;
     for my $a (@_){
         
@@ -46,34 +45,29 @@ sub dispatch{
         }
     }
     
-    
-    
     for my $a (@newa){
         
         # get /path Vector::Info::index (for Vector::Info)
         # get /path Auth::index (for Controller::Auth)
-        #if( $a->[0] eq 'get' || $a->[0] eq 'post' ){
-            
-            my @t = split(/::/, $a->[2]);
-            my $func = pop @t;
-            my $pack = join('::', @t);
-            
-            if( scalar @t > 1 ){
-                # Vector::Info::index (for Vector::Info)
-                require $cwd.'/lib/'.join('/', @t).'.pm';
-            }else{
-                # Auth::index (for Controller::Auth)
-                $pack = 'Controller::'.$pack;
-                require $cwd.'/lib/Controller/'.$t[0].'.pm';
-            }
-            
-            warn "pack=[$pack] func=[$func]";
-            
-            # ?<greet>
-            $a->[1] =~ s!:([^/:]+)!\(?<$1>[^/]+\)!g;
-            
-            $a->[3] = sub{ $pack->$func(@_) };
-        #}
+        my @t = split(/::/, $a->[2]);
+        my $func = pop @t;
+        my $pack = join('::', @t);
+        
+        if( scalar @t > 1 ){
+            # Vector::Info::index (for Vector::Info)
+            require $cwd.'/lib/'.join('/', @t).'.pm';
+        }else{
+            # Auth::index (for Controller::Auth)
+            $pack = 'Controller::'.$pack;
+            require $cwd.'/lib/Controller/'.$t[0].'.pm';
+        }
+        
+        warn "pack=[$pack] func=[$func]";
+        
+        # ?<greet>
+        $a->[1] =~ s!:([^/:]+)!\(?<$1>[^/]+\)!g;
+        
+        $a->[3] = sub{ $pack->$func(@_) };
     }
     
     $o->{env}->{root} = $cwd;
@@ -84,7 +78,7 @@ sub dispatch{
         
         my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
         
-        if( $req->request_method eq uc $a->[0] && $req->path_info =~ /$a->[1]/ ){
+        if( $req->request_method eq $a->[0] && $req->path_info =~ /$a->[1]/ ){
             
             my %rx_args = map { $_ => $+{$_} } @rx_names;
             
@@ -92,8 +86,6 @@ sub dispatch{
             last;
         }
     }
-    
-    
     
     $response->out;
 }
@@ -104,22 +96,22 @@ sub resource($){
     my $pack = ucfirst $arg;
     
     [
-        ['get', '/'.$path.'/new', $pack.'::new'],
-        ['post', '/'.$path, $pack.'::create'],
-        ['get', '/'.$path.'/:id', $pack.'::show'],
-        ['get', '/'.$path.'/:id/edit', $pack.'::edit'],
-        ['post', '/'.$path.'/:id', $pack.'::update'],
-        ['get', '/'.$path.'/:id/del', $pack.'::destroy'],
-        ['get', '/'.$path, $pack.'::index'],
+        ['GET', '/'.$path.'/new', $pack.'::new'],
+        ['POST', '/'.$path, $pack.'::create'],
+        ['GET', '/'.$path.'/:id/edit', $pack.'::edit'],
+        ['GET', '/'.$path.'/:id/del', $pack.'::destroy'],
+        ['POST', '/'.$path.'/:id', $pack.'::update'],
+        ['GET', '/'.$path.'/:id', $pack.'::show'],
+        ['GET', '/'.$path, $pack.'::index'],
     ];
 }
 
 sub get($){
-    ['get', keys %{$_[0]}, values %{$_[0]}];
+    ['GET', keys %{$_[0]}, values %{$_[0]}];
 }
 
 sub post($){
-    ['post', keys %{$_[0]}, values %{$_[0]}];
+    ['POST', keys %{$_[0]}, values %{$_[0]}];
 }
 
 
