@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use WB::Util qw(dumper);
+use WB::Template;
 
 
 sub new{
@@ -16,12 +17,27 @@ sub new{
         code => 200,
         header => [],
         body => [],
+        template_engine => '',
+        template_object => undef,
+        template_args => {},
+        mode => 'body', # body, template
         %arg,
     };
     
     if( scalar @{$o->{header}} == 0 ){
-        push @{$o->{header}}, ('Content-type', 'text/html');
+        push @{$o->{header}}, ('Content-type', 'text/html;charset=utf-8');
         push @{$o->{header}}, ('X-WB', '1');
+    }
+    
+    if( $o->{template_engine} ){
+        
+        my $t = new WB::Template(
+            template_engine => $o->{template_engine},
+        );
+        $t->init();
+        
+        $o->{template_object} = $t;
+        $o->{mode} = 'template';
     }
     
     bless $o, $class;
@@ -50,6 +66,24 @@ sub body{
     $o->{body};
 }
 
+sub template_file{
+    my $o = shift;
+    my $file = shift;
+    my $to = $o->{template_object};
+    
+    if( $file && $to ){
+        $to->template_file( $file );
+    }
+}
+
+sub template_args{
+    my $o = shift;
+    my %args = @_;
+    
+    $o->{template_args} = \%args if (@_);
+    $o->{template_args};
+}
+
 sub set404{
     my $o = shift;
     $o->{code} = 404;
@@ -62,11 +96,17 @@ sub set404{
 
 sub out{
     my $o = shift;
+    my $body = $o->{body};
+    
+    if( $o->{mode} eq 'template' ){
+        
+        $body = [ $o->{template_object}->process( %{$o->{template_args}} ) ];
+    }
     
     return [
         $o->{code},
         $o->{header},
-        $o->{body},
+        $body,
     ];
 }
 

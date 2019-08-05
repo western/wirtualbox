@@ -24,6 +24,7 @@ sub new{
     my %arg = @_;
     
     my $o = {
+        template_engine => '',
         %arg,
     };
     
@@ -43,6 +44,7 @@ sub dispatch{
         if( ref $a->[0] eq 'ARRAY' ){
             push @newa, @{$a};
         }else{
+            # for root extract
             if( $a->[1] eq '/' ){
                 $root = $a;
             }else{
@@ -62,10 +64,12 @@ sub dispatch{
         if( scalar @t > 1 ){
             # Vector::Info::index (for Vector::Info)
             require $cwd.'/lib/'.join('/', @t).'.pm';
+            $a->[4] = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
             require $cwd.'/lib/Controller/'.$t[0].'.pm';
+            $a->[4] = $cwd.'/template/Controller/'.$t[0].'/'.$func.'.html';
         }
         
         #warn "pack=[$pack] func=[$func]";
@@ -78,7 +82,7 @@ sub dispatch{
     
     $o->{env}{root} = $cwd;
     my $req = new WB::Request(env=>$o->{env});
-    my $response = new WB::Response(env=>$o->{env});
+    my $response = new WB::Response(env=>$o->{env}, template_engine=>$o->{template_engine});
     
     my $found = 0;
     if( $req->request_method eq 'GET' && $req->path_info eq '/' ){
@@ -86,16 +90,20 @@ sub dispatch{
         my @t = split(/::/, $root->[2]);
         my $func = pop @t;
         my $pack = join('::', @t);
+        my $template_file = '';
         
         if( scalar @t > 1 ){
             # Vector::Info::index (for Vector::Info)
             require $cwd.'/lib/'.join('/', @t).'.pm';
+            $template_file = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
             require $cwd.'/lib/Controller/'.$t[0].'.pm';
+            $template_file = $cwd.'/template/Controller/'.$t[0].'/'.$func.'.html';
         }
         
+        $response->template_file($template_file);
         $pack->$func($req, $response);
         $found = 1;
         
@@ -111,12 +119,15 @@ sub dispatch{
                 
                 my %rx_args = map { $_ => $+{$_} } @rx_names;
                 
+                $response->template_file($a->[4]);
                 $a->[3]->($req, $response, \%rx_args);
                 $found = 1;
                 last;
             }
         }
     }
+    
+    #warn dumper \@newa;
     
     $response->set404 if !$found;
     

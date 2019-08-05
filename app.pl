@@ -10,10 +10,14 @@ use WB::Router qw(:def);
 
 
 
+
 my $app = sub {
     
     WB::Router->new(
+        
         env => shift,
+        template_engine => 'Template',
+        
     )->dispatch(
         
         root 'Page::index',
