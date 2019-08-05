@@ -8,9 +8,9 @@ NOLOG=--disable-logging
 
 
 debug:
-	$(UWSGI) $(PIDFILE) $(STATICMAP) --psgi app.pl
+	$(UWSGI) $(PIDFILE) $(CHKSTATIC) --psgi app.pl
 run:
-	$(UWSGI) $(PIDFILE) $(STATICMAP) --psgi app.pl $(DAEMONIZE)
+	$(UWSGI) $(PIDFILE) $(CHKSTATIC) --psgi app.pl $(DAEMONIZE)
 kill:
 	kill -9 `cat /tmp/wirtualbox.pid` ; rm /tmp/wirtualbox.log
 getbootstrap:

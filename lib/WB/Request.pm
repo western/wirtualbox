@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use HTTP::Entity::Parser;
+use Cookie::Baker ();
 
 use WB::Util qw(dumper url_unescape decode);
 use WB::File;
@@ -139,5 +140,14 @@ sub param{
     return @values;
 }
 
+sub cookie{
+    my $o = shift;
+    my $name = shift;
+    
+    return undef unless($o->{env}{HTTP_COOKIE});
+    
+    $o->{cookie} = Cookie::Baker::crush_cookie($o->{env}{HTTP_COOKIE}) unless($o->{cookie});
+    $o->{cookie}{$name};
+}
 
 1;

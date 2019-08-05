@@ -18,3 +18,5 @@ zypper in -y uwsgi-psgi uwsgi
 zypper in -y perl-HTML-Template perl-Template-Toolkit
 
 cpan HTTP::Entity::Parser
+cpan Cookie::Baker
+
