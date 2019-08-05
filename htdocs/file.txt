@@ -1,2 +1,0 @@
-context for file.txt, static file
-

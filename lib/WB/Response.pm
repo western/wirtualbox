@@ -18,7 +18,9 @@ sub new{
     my $o = {
         code => 200,
         header => [],
+        cookie => [],
         body => [],
+        
         template_engine => '',
         template_object => undef,
         template_args => {},
@@ -68,18 +70,24 @@ sub header{
     $o->{header};
 }
 
+=head1 cookie
+
+    cookie(
+        name => '',
+        value => '',
+        path => '',
+        domain => '',
+        expires => '+24h',
+    )
+
+=cut
 sub cookie{
     my $o = shift;
     my %arg = @_;
     
-    my $cookie = Cookie::Baker::bake_cookie($arg{name}, {
+    push @{$o->{cookie}}, Cookie::Baker::bake_cookie($arg{name}, {
         %arg,
-        #value => $value,
-        #path => "test",
-        #domain => '.example.com',
-        #expires => '+24h'
     });
-    push @{$o->{header}}, 'Set-Cookie' => $cookie;
 }
 
 sub body{
@@ -124,6 +132,10 @@ sub out{
     
     if( $o->{mode} eq 'template' ){
         $body = [ $o->{template_object}->process( %{$o->{template_args}} ) ];
+    }
+    
+    for my $c (@{$o->{cookie}}){
+        push @{$o->{header}}, 'Set-Cookie' => $c;
     }
     
     return [
