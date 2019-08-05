@@ -4,6 +4,8 @@ package WB::Response;
 use strict;
 use warnings;
 
+use Cookie::Baker ();
+
 use WB::Util qw(dumper);
 use WB::Template;
 
@@ -64,6 +66,20 @@ sub header{
     
     push @{$o->{header}}, ($name, $value) if ($name);
     $o->{header};
+}
+
+sub cookie{
+    my $o = shift;
+    my %arg = @_;
+    
+    my $cookie = Cookie::Baker::bake_cookie($arg{name}, {
+        %arg,
+        #value => $value,
+        #path => "test",
+        #domain => '.example.com',
+        #expires => '+24h'
+    });
+    push @{$o->{header}}, 'Set-Cookie' => $cookie;
 }
 
 sub body{
