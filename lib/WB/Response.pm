@@ -43,6 +43,13 @@ sub new{
     bless $o, $class;
 }
 
+sub mode{
+    my $o = shift;
+    my $arg = shift;
+    $o->{mode} = $arg if ($arg);
+    $o->{mode};
+}
+
 sub code{
     my $o = shift;
     my $arg = shift;
@@ -86,6 +93,7 @@ sub template_args{
 
 sub set404{
     my $o = shift;
+    $o->{mode} = 'body';
     $o->{code} = 404;
     $o->{body} = [
         '<h1>404</h1><hr>',
@@ -99,7 +107,6 @@ sub out{
     my $body = $o->{body};
     
     if( $o->{mode} eq 'template' ){
-        
         $body = [ $o->{template_object}->process( %{$o->{template_args}} ) ];
     }
     

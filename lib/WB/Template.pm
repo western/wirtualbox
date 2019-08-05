@@ -36,6 +36,13 @@ sub init{
             ABSOLUTE     => 1,
         }) or die $Template::ERROR;
     }
+    
+    if( $o->{template_engine} eq 'HTML::Template' ){
+        
+        require HTML::Template;
+        
+        #$o->{template_object} = HTML::Template->new(filename  => 'template.tmpl');
+    }
 }
 
 sub template_file{
@@ -54,6 +61,13 @@ sub process{
     if( $to && $o->{template_engine} eq 'Template' ){
         
         $to->process($o->{template_file}, \%arg, \$out) or die $to->error();
+    }
+    
+    if( $o->{template_engine} eq 'HTML::Template' ){
+        
+        $to = HTML::Template->new(filename => $o->{template_file});
+        $to->param(%arg);
+        $out = $to->output;
     }
     
     $out;
