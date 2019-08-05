@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+use Cwd;
+use File::Path qw(make_path remove_tree);
+
+help() unless(@ARGV);
+
+my $root = getcwd;
+$root =~ s!/bin$!!;
+
+if( $ARGV[0] eq 'controller' && $ARGV[1] ){
+    
+    my $pack = ucfirst lc $ARGV[1];
+    
+    make_path($root.'/lib/Controller');
+    
+    open my $fl, '>', $root.'/lib/Controller/'.$pack.'.pm' or die $!;
+    print $fl "\n";
+    print $fl 'package Controller::'.$pack.";\n";
+    print $fl "\n";
+    print $fl 'use WB::Util qw(dumper);';
+    print $fl "\n";
+    print $fl q~
+
+sub index{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+sub new{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+sub create{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+sub show{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+sub edit{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+sub update{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+sub destroy{
+    my($o, $req, $res, $args) = @_;
+    
+}
+
+1;
+    ~;
+    
+    close $fl;
+    
+    make_path($root.'/template/Controller/'.$pack);
+    
+    for my $a (qw(index new create show edit update destroy)){
+        open $fl, '>', $root.'/template/Controller/'.$pack.'/'.$a.'.html' or die $!;
+        close $fl;
+    }
+    
+    exit;
+}
+
+
+
+
+sub help{
+    print q~
+    
+    wb controller Directory
+    
+    wb destroy Auth
+    
+    ~;
+    exit;
+}
