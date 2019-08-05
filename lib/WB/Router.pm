@@ -68,7 +68,7 @@ sub dispatch{
             require $cwd.'/lib/Controller/'.$t[0].'.pm';
         }
         
-        warn "pack=[$pack] func=[$func]";
+        #warn "pack=[$pack] func=[$func]";
         
         # ?<greet>
         $a->[1] =~ s!:([^/:]+)!\(?<$1>[^/]+\)!g;
@@ -105,7 +105,9 @@ sub dispatch{
             
             my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
             
-            if( $req->request_method eq $a->[0] && $req->path_info =~ /^$a->[1]/ ){
+            if( $req->request_method eq $a->[0] && $req->path_info =~ /^$a->[1]$/ ){
+                
+                #warn '$req->path_info='.$req->path_info.' $a->[1]='.$a->[1];
                 
                 my %rx_args = map { $_ => $+{$_} } @rx_names;
                 
