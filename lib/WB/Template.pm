@@ -49,7 +49,9 @@ sub template_file{
     my $o = shift;
     
     $o->{template_file} = $_[0] if ($_[0]);
-    $o->{template_file};
+    $o->{template_main} = $_[1] if ($_[1]);
+    
+    wantarray ? ($o->{template_file}, $o->{template_main}) : $o->{template_file};
 }
 
 sub process{
@@ -60,13 +62,22 @@ sub process{
     
     if( $to && $o->{template_engine} eq 'Template' ){
         
-        $to->process($o->{template_file}, \%arg, \$out) or die $to->error();
+        my $main = '';
+        $to->process($o->{template_file}, \%arg, \$main) or die $to->error();
+        
+        $to->process($o->{template_main}, {main => $main}, \$out) or die $to->error();
     }
     
     if( $o->{template_engine} eq 'HTML::Template' ){
         
+        warn $o->{template_file};
         $to = HTML::Template->new(filename => $o->{template_file});
         $to->param(%arg);
+        my $main = $to->output;
+        
+        warn $o->{template_main};
+        $to = HTML::Template->new(filename => $o->{template_main});
+        $to->param(main => $main);
         $out = $to->output;
     }
     

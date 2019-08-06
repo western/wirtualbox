@@ -64,6 +64,23 @@ sub get_required{
     undef;
 }
 
+sub get_main_template{
+    my $file = shift;
+    
+    open my $f, '<', $file or die $!;
+    while(my $s = <$f>){
+        
+        if( $s =~ m!main_template(?:\s+)('|")(.+?)\1;! && $s !~ /^#/ ){
+            
+            close $f;
+            return $2;
+        }
+    }
+    close $f;
+    
+    'main';
+}
+
 sub dispatch{
     my $o = shift;
     my $cwd = getcwd();
@@ -101,6 +118,8 @@ sub dispatch{
             
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/'.join('/', @t).'.pm');
             $a->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
+            
+            $a->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/'.join('/', @t).'.pm').'.html';
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
@@ -109,6 +128,8 @@ sub dispatch{
             
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/Controller/'.$t[0].'.pm');
             $a->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
+            
+            $a->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/Controller/'.$t[0].'.pm').'.html';
         }
         
         #warn "pack=[$pack] func=[$func]";
@@ -130,26 +151,29 @@ sub dispatch{
         my @t = split(/::/, $root->[2]);
         my $func = pop @t;
         my $pack = join('::', @t);
-        my $template_file = '';
         
         if( scalar @t > 1 ){
             # Vector::Info::index (for Vector::Info)
             require $cwd.'/lib/'.join('/', @t).'.pm';
-            $template_file = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+            $root->[4] = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
             
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/'.join('/', @t).'.pm');
             $root->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
+            
+            $root->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/'.join('/', @t).'.pm').'.html';
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
             require $cwd.'/lib/Controller/'.$t[0].'.pm';
-            $template_file = $cwd.'/template/Controller/'.$t[0].'/'.$func.'.html';
+            $root->[4] = $cwd.'/template/Controller/'.$t[0].'/'.$func.'.html';
             
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/Controller/'.$t[0].'.pm');
             $root->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
+            
+            $root->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/Controller/'.$t[0].'.pm').'.html';
         }
         
-        $response->template_file($template_file);
+        $response->template_file($root->[4], $root->[6]);
         if($root->[5]){
             $pack->$func($req) if ($root->[5]($req));
         }else{
@@ -169,7 +193,7 @@ sub dispatch{
                 
                 my %rx_args = map { $_ => $+{$_} } @rx_names;
                 
-                $response->template_file($a->[4]);
+                $response->template_file($a->[4], $a->[6]);
                 if( $a->[5] ){
                     $a->[3]->($req, \%rx_args) if ($a->[5]->($req, \%rx_args));
                 }else{

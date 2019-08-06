@@ -1,14 +1,18 @@
 
 package Controller::Auth;
 
-use WB::Util qw(dumper);
+use WB::Util qw(dumper main_template);
+
+
+#main_template 'main2';
 
 
 sub index{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
     #$res->body(__PACKAGE__." index call");
     #$res->body(dumper $args);
+=head1    
     $res->body(q~
                 <form method=post action='/auth/login' >
                     <input type="hidden" name="hid1" value="val1">
@@ -31,16 +35,16 @@ sub index{
                 <br><a href="?n1=value1&n1=value11&n2=value2">!Clickme</a><br>
             ~,
     );
-    
+=cut    
     #warn __PACKAGE__." index call";
     #warn "dumper ".dumper(\@_);
 }
 
 sub login{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
-    $res->body(__PACKAGE__." login call");
-    $res->body(dumper $args);
+    #$res->body(__PACKAGE__." login call");
+    #$res->body(dumper $args);
     
     #warn __PACKAGE__." index call";
     #warn "dumper ".dumper(\@_);

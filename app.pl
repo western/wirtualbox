@@ -22,18 +22,21 @@ my $app = sub {
     )->dispatch(
         
         root 'Page::index',
-        resource 'photo',
+        #resource 'photo',
         
-        get {'/get_api' => 'Page::get_api'},
-        
-        get {'/api' => 'Api::index'},
-        post {'/api' => 'Api::post'},
-        
-        get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
-        get {'/vector/info/:option' => 'Vector::Info::simple'},
-        get {'/vector/info' => 'Vector::Info::index'},
-        
-        post {'/auth/login' => 'Auth::login'},
         get {'/auth' => 'Auth::index'},
+        post {'/auth/login' => 'Auth::login'},
+        
+        #get {'/get_api' => 'Page::get_api'},
+        
+        #get {'/api' => 'Api::index'},
+        #post {'/api' => 'Api::post'},
+        
+        #get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
+        #get {'/vector/info/:option' => 'Vector::Info::simple'},
+        #get {'/vector/info' => 'Vector::Info::index'},
+        
+        #post {'/auth/login' => 'Auth::login'},
+        #get {'/auth' => 'Auth::index'},
     );
 };

@@ -16,7 +16,7 @@ my (%ENCODING, %PATTERN);
 our @EXPORT_OK = (
     qw(decode encode),
     qw(url_escape url_unescape),
-    qw(dumper required),
+    qw(dumper required main_template),
 );
 
 sub decode {
@@ -62,6 +62,9 @@ sub dumper{
 }
 
 sub required{
+}
+
+sub main_template{
 }
 
 1;

@@ -122,10 +122,11 @@ sub json{
 sub template_file{
     my $o = shift;
     my $file = shift;
+    my $template_main = shift;
     my $to = $o->{template_object};
     
     if( $file && $to ){
-        $to->template_file( $file );
+        $to->template_file( $file, $template_main );
     }
 }
 
@@ -142,9 +143,8 @@ sub set404{
     $o->{mode} = 'body';
     $o->{code} = 404;
     $o->{body} = [
-        '<h1>404</h1><hr>',
+        '<h1>404 Not Found</h1><hr>',
         $o->{env}{PATH_INFO},
-        ' not found',
     ];
 }
 
@@ -164,9 +164,8 @@ sub set403{
     $o->{mode} = 'body';
     $o->{code} = 403;
     $o->{body} = [
-        '<h1>403</h1><hr>',
+        '<h1>403 Forbidden</h1><hr>',
         $o->{env}{PATH_INFO},
-        ' forbidden',
     ];
 }
 
