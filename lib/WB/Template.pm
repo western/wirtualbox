@@ -51,6 +51,10 @@ sub template_file{
     $o->{template_file} = $_[0] if ($_[0]);
     $o->{template_layout} = $_[1] if ($_[1]);
     
+    if( $o->{template_layout} && $o->{template_layout} =~ m!none\.html$! ){
+        $o->{template_layout} = 'none';
+    }
+    
     wantarray ? ($o->{template_file}, $o->{template_layout}) : $o->{template_file};
 }
 
@@ -65,7 +69,11 @@ sub process{
         my $main = '';
         $to->process($o->{template_file}, \%arg, \$main) or die $to->error();
         
-        $to->process($o->{template_layout}, {main => $main}, \$out) or die $to->error();
+        if( $o->{template_layout} && $o->{template_layout} ne 'none' ){
+            $to->process($o->{template_layout}, {main => $main}, \$out) or die $to->error();
+        }else{
+            $out = $main;
+        }
     }
     
     if( $o->{template_engine} eq 'HTML::Template' ){
@@ -75,7 +83,7 @@ sub process{
         $to->param(%arg);
         my $main = $to->output;
         
-        if( $o->{template_layout} && $o->{template_layout} !~ m!none\.html$! ){
+        if( $o->{template_layout} && $o->{template_layout} ne 'none' ){
             $to = HTML::Template->new(filename => $o->{template_layout});
             $to->param(main => $main);
             $out = $to->output;
