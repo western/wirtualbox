@@ -1,0 +1,77 @@
+
+package WB::Cookie;
+
+use strict;
+use warnings;
+
+use Cookie::Baker ();
+use Crypt::Blowfish;
+
+use WB::Util qw(dumper);
+
+
+=head1 new
+    
+    Create cookie storage
+    
+=cut
+sub new{
+    my $c = shift;
+    my $class = ref $c || $c;
+    my %arg = @_;
+    
+    my $o = {
+        %arg,
+    };
+    
+    bless $o, $class;
+}
+
+=head1 get
+    
+    Get cookie by name
+    
+=cut
+sub get{
+    my $o = shift;
+    my $name = shift;
+    
+    return undef unless($o->{env}{HTTP_COOKIE});
+    
+    $o->{get_cookie} = Cookie::Baker::crush_cookie($o->{env}{HTTP_COOKIE}) unless($o->{cookie});
+    $o->{get_cookie}{$name};
+}
+
+=head1 add
+    
+    Add new cookie for output header
+    
+    cookie(
+        name => '',
+        value => '',
+        path => '',
+        domain => '',
+        expires => '+24h',
+    )
+    
+=cut
+sub add{
+    my $o = shift;
+    my %arg = shift;
+    
+    push @{$o->{add_cookie}}, \%arg;
+}
+
+sub out{
+    my $o = shift;
+    
+    my @c = map {
+        'Set-Cookie' => Cookie::Baker::bake_cookie($_->{name}, {
+            %{$_},
+        })
+    } @{$o->{add_cookie}};
+    
+    
+}
+
+1;

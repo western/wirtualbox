@@ -5,6 +5,8 @@ use strict;
 use warnings;
 
 use Cookie::Baker ();
+use JSON::XS;
+use Crypt::CBC;
 
 use WB::Util qw(dumper);
 use WB::Template;
@@ -84,6 +86,18 @@ sub header{
 sub cookie{
     my $o = shift;
     my %arg = @_;
+    
+    if( $arg{json} && $arg{value} ){
+        $arg{value} = JSON::XS->new->utf8->encode($arg{value});
+    }
+    
+    if( $arg{crypt} && $arg{value} ){
+        my $cipher = Crypt::CBC->new(
+            -key => $o->{secret},
+            -cipher => 'Blowfish'
+        );
+        $arg{value} = $cipher->encrypt_hex($arg{value});
+    }
     
     push @{$o->{cookie}}, Cookie::Baker::bake_cookie($arg{name}, {
         %arg,

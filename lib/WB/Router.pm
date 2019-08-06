@@ -81,8 +81,9 @@ sub dispatch{
     }
     
     $o->{env}{root} = $cwd;
-    my $req = new WB::Request(env=>$o->{env});
-    my $response = new WB::Response(env=>$o->{env}, template_engine=>$o->{template_engine});
+    my $response = new WB::Response(env=>$o->{env}, template_engine=>$o->{template_engine}, secret=>$o->{secret});
+    my $req = new WB::Request(env=>$o->{env}, response=>$response, secret=>$o->{secret});
+    
     
     my $found = 0;
     if( $req->request_method eq 'GET' && $req->path_info eq '/' ){
@@ -104,7 +105,7 @@ sub dispatch{
         }
         
         $response->template_file($template_file);
-        $pack->$func($req, $response);
+        $pack->$func($req);
         $found = 1;
         
     }else{
@@ -120,7 +121,7 @@ sub dispatch{
                 my %rx_args = map { $_ => $+{$_} } @rx_names;
                 
                 $response->template_file($a->[4]);
-                $a->[3]->($req, $response, \%rx_args);
+                $a->[3]->($req, \%rx_args);
                 $found = 1;
                 last;
             }

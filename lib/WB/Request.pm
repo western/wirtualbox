@@ -6,6 +6,8 @@ use warnings;
 
 use HTTP::Entity::Parser;
 use Cookie::Baker ();
+use JSON::XS;
+use Crypt::CBC;
 
 use WB::Util qw(dumper url_unescape decode);
 use WB::File;
@@ -23,6 +25,11 @@ sub new{
     };
     
     bless $o, $class;
+}
+
+sub response{
+    my $o = shift;
+    $o->{response};
 }
 
 sub charset{
@@ -143,11 +150,27 @@ sub param{
 sub cookie{
     my $o = shift;
     my $name = shift;
+    my %arg = @_;
     
     return undef unless($o->{env}{HTTP_COOKIE});
     
     $o->{cookie} = Cookie::Baker::crush_cookie($o->{env}{HTTP_COOKIE}) unless($o->{cookie});
-    $o->{cookie}{$name};
+    
+    my $ret = $o->{cookie}{$name};
+    
+    if( $arg{decrypt} && $ret ){
+        my $cipher = Crypt::CBC->new(
+            -key => $o->{secret},
+            -cipher => 'Blowfish',
+        );
+        $ret = $cipher->decrypt_hex($ret);
+    }
+    
+    if( $arg{json} && $ret ){
+        $ret = JSON::XS->new->utf8->decode($ret);
+    }
+    
+    $ret;
 }
 
 1;

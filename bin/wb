@@ -27,37 +27,37 @@ if( $ARGV[0] eq 'controller' && $ARGV[1] ){
     print $fl q~
 
 sub index{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
 sub new{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
 sub create{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
 sub show{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
 sub edit{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
 sub update{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
 sub destroy{
-    my($o, $req, $res, $args) = @_;
+    my($o, $r, $args) = @_;
     
 }
 
