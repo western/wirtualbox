@@ -16,7 +16,7 @@ my (%ENCODING, %PATTERN);
 our @EXPORT_OK = (
     qw(decode encode),
     qw(url_escape url_unescape),
-    qw(dumper),
+    qw(dumper required),
 );
 
 sub decode {
@@ -61,5 +61,7 @@ sub dumper{
     Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
 }
 
+sub required{
+}
 
 1;

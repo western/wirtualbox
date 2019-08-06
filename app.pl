@@ -24,6 +24,11 @@ my $app = sub {
         root 'Page::index',
         resource 'photo',
         
+        get {'/get_api' => 'Page::get_api'},
+        
+        get {'/api' => 'Api::index'},
+        post {'/api' => 'Api::post'},
+        
         get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
         get {'/vector/info/:option' => 'Vector::Info::simple'},
         get {'/vector/info' => 'Vector::Info::index'},

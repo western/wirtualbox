@@ -31,6 +31,39 @@ sub new{
     bless $o, $class;
 }
 
+sub get_required{
+    my $cwd = shift;
+    my $file = shift;
+    
+    open my $f, '<', $file or die $!;
+    while(my $s = <$f>){
+        
+        if( $s =~ m!required(?:\s+)('|")(.+?)\1;! && $s !~ /^#/ ){
+            
+            my @t = split('::', $2);
+            # 'Application::auth_required'
+            # 'Vector::Info::auth_required'
+            my $func = pop @t;
+            my $pack = join('::', @t);
+            
+            if( scalar @t > 1 ){
+                # Vector::Info
+                require $cwd.'/lib/'.join('/', @t).'.pm';
+            }else{
+                # Controller::Application
+                $pack = 'Controller::'.$pack;
+                require $cwd.'/lib/Controller/'.$t[0].'.pm';
+            }
+            
+            close $f;
+            return ($pack, $func);
+        }
+    }
+    close $f;
+    
+    undef;
+}
+
 sub dispatch{
     my $o = shift;
     my $cwd = getcwd();
@@ -65,11 +98,17 @@ sub dispatch{
             # Vector::Info::index (for Vector::Info)
             require $cwd.'/lib/'.join('/', @t).'.pm';
             $a->[4] = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+            
+            my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/'.join('/', @t).'.pm');
+            $a->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
             require $cwd.'/lib/Controller/'.$t[0].'.pm';
             $a->[4] = $cwd.'/template/Controller/'.$t[0].'/'.$func.'.html';
+            
+            my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/Controller/'.$t[0].'.pm');
+            $a->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
         }
         
         #warn "pack=[$pack] func=[$func]";
@@ -97,15 +136,25 @@ sub dispatch{
             # Vector::Info::index (for Vector::Info)
             require $cwd.'/lib/'.join('/', @t).'.pm';
             $template_file = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+            
+            my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/'.join('/', @t).'.pm');
+            $root->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
             require $cwd.'/lib/Controller/'.$t[0].'.pm';
             $template_file = $cwd.'/template/Controller/'.$t[0].'/'.$func.'.html';
+            
+            my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/Controller/'.$t[0].'.pm');
+            $root->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
         }
         
         $response->template_file($template_file);
-        $pack->$func($req);
+        if($root->[5]){
+            $pack->$func($req) if ($root->[5]($req));
+        }else{
+            $pack->$func($req);
+        }
         $found = 1;
         
     }else{
@@ -121,7 +170,11 @@ sub dispatch{
                 my %rx_args = map { $_ => $+{$_} } @rx_names;
                 
                 $response->template_file($a->[4]);
-                $a->[3]->($req, \%rx_args);
+                if( $a->[5] ){
+                    $a->[3]->($req, \%rx_args) if ($a->[5]->($req, \%rx_args));
+                }else{
+                    $a->[3]->($req, \%rx_args);
+                }
                 $found = 1;
                 last;
             }
@@ -162,6 +215,7 @@ sub get($){
 sub post($){
     ['POST', keys %{$_[0]}, values %{$_[0]}];
 }
+
 
 
 1;

@@ -26,7 +26,7 @@ sub new{
         template_engine => '',
         template_object => undef,
         template_args => {},
-        mode => 'body', # body, template
+        mode => 'body', # body, template, json
         %arg,
     };
     
@@ -111,6 +111,14 @@ sub body{
     $o->{body};
 }
 
+sub json{
+    my $o = shift;
+    $o->{mode} = 'json';
+    
+    push @{$o->{body}}, @_ if (@_);
+    $o->{body};
+}
+
 sub template_file{
     my $o = shift;
     my $file = shift;
@@ -140,12 +148,42 @@ sub set404{
     ];
 }
 
+sub set301{
+    my $o = shift;
+    my $goto = shift;
+    
+    $o->{header} = ['Location', $goto];
+    
+    $o->{mode} = 'body';
+    $o->{code} = 301;
+    $o->{body} = [];
+}
+
+sub set403{
+    my $o = shift;
+    $o->{mode} = 'body';
+    $o->{code} = 403;
+    $o->{body} = [
+        '<h1>403</h1><hr>',
+        $o->{env}{PATH_INFO},
+        ' forbidden',
+    ];
+}
+
 sub out{
     my $o = shift;
     my $body = $o->{body};
     
     if( $o->{mode} eq 'template' ){
         $body = [ $o->{template_object}->process( %{$o->{template_args}} ) ];
+    }
+    
+    if( $o->{mode} eq 'json' ){
+        $o->{header} = [];
+        push @{$o->{header}}, ('Content-type', 'application/json;charset=utf-8');
+        push @{$o->{header}}, ('X-WB', '1');
+        
+        $body = [ JSON::XS->new->utf8->encode($body->[0]) ];
     }
     
     for my $c (@{$o->{cookie}}){
