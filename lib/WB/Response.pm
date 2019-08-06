@@ -80,6 +80,9 @@ sub header{
         path => '',
         domain => '',
         expires => '+24h',
+        
+        json => 0,
+        crypt => 0,
     )
 
 =cut

@@ -15,7 +15,7 @@ sub new{
     my $o = {
         template_engine => 'Template',
         template_object => undef,
-        template_main => '',
+        template_layout => '',
         template_file => '',
         %arg,
     };
@@ -49,9 +49,9 @@ sub template_file{
     my $o = shift;
     
     $o->{template_file} = $_[0] if ($_[0]);
-    $o->{template_main} = $_[1] if ($_[1]);
+    $o->{template_layout} = $_[1] if ($_[1]);
     
-    wantarray ? ($o->{template_file}, $o->{template_main}) : $o->{template_file};
+    wantarray ? ($o->{template_file}, $o->{template_layout}) : $o->{template_file};
 }
 
 sub process{
@@ -65,20 +65,23 @@ sub process{
         my $main = '';
         $to->process($o->{template_file}, \%arg, \$main) or die $to->error();
         
-        $to->process($o->{template_main}, {main => $main}, \$out) or die $to->error();
+        $to->process($o->{template_layout}, {main => $main}, \$out) or die $to->error();
     }
     
     if( $o->{template_engine} eq 'HTML::Template' ){
         
-        warn $o->{template_file};
+        
         $to = HTML::Template->new(filename => $o->{template_file});
         $to->param(%arg);
         my $main = $to->output;
         
-        warn $o->{template_main};
-        $to = HTML::Template->new(filename => $o->{template_main});
-        $to->param(main => $main);
-        $out = $to->output;
+        if( $o->{template_layout} && $o->{template_layout} !~ m!none\.html$! ){
+            $to = HTML::Template->new(filename => $o->{template_layout});
+            $to->param(main => $main);
+            $out = $to->output;
+        }else{
+            $out = $main;
+        }
     }
     
     $out;

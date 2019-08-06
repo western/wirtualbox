@@ -64,13 +64,13 @@ sub get_required{
     undef;
 }
 
-sub get_main_template{
+sub get_template_layout{
     my $file = shift;
     
     open my $f, '<', $file or die $!;
     while(my $s = <$f>){
         
-        if( $s =~ m!main_template(?:\s+)('|")(.+?)\1;! && $s !~ /^#/ ){
+        if( $s =~ m!template_layout(?:\s+)('|")(.+?)\1;! && $s !~ /^#/ ){
             
             close $f;
             return $2;
@@ -119,7 +119,7 @@ sub dispatch{
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/'.join('/', @t).'.pm');
             $a->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
             
-            $a->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/'.join('/', @t).'.pm').'.html';
+            $a->[6] = $cwd.'/template/'.get_template_layout($cwd.'/lib/'.join('/', @t).'.pm').'.html';
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
@@ -129,7 +129,7 @@ sub dispatch{
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/Controller/'.$t[0].'.pm');
             $a->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
             
-            $a->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/Controller/'.$t[0].'.pm').'.html';
+            $a->[6] = $cwd.'/template/'.get_template_layout($cwd.'/lib/Controller/'.$t[0].'.pm').'.html';
         }
         
         #warn "pack=[$pack] func=[$func]";
@@ -160,7 +160,7 @@ sub dispatch{
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/'.join('/', @t).'.pm');
             $root->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
             
-            $root->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/'.join('/', @t).'.pm').'.html';
+            $root->[6] = $cwd.'/template/'.get_template_layout($cwd.'/lib/'.join('/', @t).'.pm').'.html';
         }else{
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
@@ -170,7 +170,7 @@ sub dispatch{
             my ($gr1, $gr2) = get_required($cwd, $cwd.'/lib/Controller/'.$t[0].'.pm');
             $root->[5] = sub{ $gr1->$gr2(@_) } if($gr1);
             
-            $root->[6] = $cwd.'/template/'.get_main_template($cwd.'/lib/Controller/'.$t[0].'.pm').'.html';
+            $root->[6] = $cwd.'/template/'.get_template_layout($cwd.'/lib/Controller/'.$t[0].'.pm').'.html';
         }
         
         $response->template_file($root->[4], $root->[6]);

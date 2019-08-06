@@ -123,7 +123,7 @@ sub _param_parse{
 
 sub param{
     my $o = shift;
-    my $name = shift;
+    my @names = @_;
     
     
     
@@ -136,7 +136,8 @@ sub param{
     my @values;
     my $param = $o->{param} || [];
     for (my $i = 0; $i < @$param; $i += 2) {
-        push @values, $param->[$i + 1] if $param->[$i] eq $name;
+        #push @values, $param->[$i + 1] if $param->[$i] eq $name;
+        push @values, $param->[$i + 1] if grep(/^$param->[$i]$/, @names);
     }
     
     #print "$$ get param '$name'\n";
