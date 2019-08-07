@@ -7,6 +7,7 @@ use warnings;
 
 use WB::Request;
 use WB::Response;
+use WB::DB;
 use WB::Util qw(dumper);
 
 use Exporter 'import';
@@ -141,8 +142,16 @@ sub dispatch{
     }
     
     $o->{env}{root} = $cwd;
+    my $db;
+    if( $o->{db_dsn} ){
+        $db = WB::DB::connect(
+            dsn => $o->{db_dsn},
+            login => $o->{db_login},
+            password => $o->{db_password},
+        );
+    }
     my $response = new WB::Response(env=>$o->{env}, template_engine=>$o->{template_engine}, secret=>$o->{secret});
-    my $req = new WB::Request(env=>$o->{env}, response=>$response, secret=>$o->{secret});
+    my $req = new WB::Request(env=>$o->{env}, response=>$response, secret=>$o->{secret}, db=>$db);
     
     
     my $found = 0;

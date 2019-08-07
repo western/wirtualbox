@@ -19,6 +19,10 @@ our @EXPORT_OK = (
     qw(dumper required template_layout),
 );
 
+our %EXPORT_TAGS = (def => [qw(dumper required template_layout)]);
+
+
+
 sub decode {
     my ($encoding, $bytes) = @_;
     return undef unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };

@@ -122,7 +122,7 @@ sub json{
     $o->{body};
 }
 
-sub template_file{
+sub template_file($$){
     my $o = shift;
     my $file = shift;
     my $template_main = shift;
@@ -155,7 +155,7 @@ sub set301{
     my $o = shift;
     my $goto = shift;
     
-    $o->{header} = ['Location', $goto];
+    $o->{header} = ['cache-control', 'no-cache', 'Location', $goto];
     
     $o->{mode} = 'body';
     $o->{code} = 301;
@@ -189,7 +189,7 @@ sub out{
     }
     
     for my $c (@{$o->{cookie}}){
-        push @{$o->{header}}, 'Set-Cookie' => $c;
+        unshift @{$o->{header}}, 'Set-Cookie' => $c;
     }
     
     return [

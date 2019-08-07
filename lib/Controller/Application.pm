@@ -2,7 +2,7 @@
 package Controller::Application;
 
 use utf8;
-use WB::Util qw(dumper);
+use WB::Util qw(:def);
 
 
 sub auth_required{

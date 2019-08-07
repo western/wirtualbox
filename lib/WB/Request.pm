@@ -27,6 +27,11 @@ sub new{
     bless $o, $class;
 }
 
+sub db{
+    my $o = shift;
+    $o->{db};
+}
+
 sub response{
     my $o = shift;
     $o->{response};

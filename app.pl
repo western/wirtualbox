@@ -17,6 +17,11 @@ my $app = sub {
         
         env => shift,
         template_engine => 'HTML::Template',
+        
+        db_dsn => 'DBI:mysql:database=test;host=127.0.0.1',
+        db_login => 'test',
+        db_password => 'test',
+        
         secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
         
     )->dispatch(
@@ -26,17 +31,11 @@ my $app = sub {
         
         get {'/auth' => 'Auth::index'},
         post {'/auth/login' => 'Auth::login'},
+        get {'/auth/logout' => 'Auth::logout'},
         
-        #get {'/get_api' => 'Page::get_api'},
+        get {'/admin' => 'Admin::Page::index'},
+        get {'/admin/order' => 'Admin::Order::index'},
         
-        #get {'/api' => 'Api::index'},
-        #post {'/api' => 'Api::post'},
         
-        #get {'/vector/info/:option/:option2' => 'Vector::Info::hard'},
-        #get {'/vector/info/:option' => 'Vector::Info::simple'},
-        #get {'/vector/info' => 'Vector::Info::index'},
-        
-        #post {'/auth/login' => 'Auth::login'},
-        #get {'/auth' => 'Auth::index'},
     );
 };

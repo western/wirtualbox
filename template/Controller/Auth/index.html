@@ -59,7 +59,7 @@ $('form.form-signin').on('submit', function(){
     
     $.post('/auth/login', $('form.form-signin').serialize(), function(data){
         if(data.code == 'ok'){
-            location.href = '/';
+            location.href = '/admin';
         }else{
             $('#msg').html(data.err);
         }

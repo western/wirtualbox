@@ -42,4 +42,11 @@ sub login{
     }
 }
 
+sub logout{
+    my($o, $r, $args) = @_;
+    
+    $r->response->cookie(name => 'auth', value => '', path => '/', expires => '+24h',);
+    $r->response->set301('/');
+}
+
 1;

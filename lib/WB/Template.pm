@@ -70,7 +70,8 @@ sub process{
         $to->process($o->{template_file}, \%arg, \$main) or die $to->error();
         
         if( $o->{template_layout} && $o->{template_layout} ne 'none' ){
-            $to->process($o->{template_layout}, {main => $main}, \$out) or die $to->error();
+            $arg{main} = $main;
+            $to->process($o->{template_layout}, \%arg, \$out) or die $to->error();
         }else{
             $out = $main;
         }
@@ -78,13 +79,13 @@ sub process{
     
     if( $o->{template_engine} eq 'HTML::Template' ){
         
-        
-        $to = HTML::Template->new(filename => $o->{template_file});
+        $to = HTML::Template->new(filename => $o->{template_file}, die_on_bad_params => 0, utf8 => 1);
         $to->param(%arg);
         my $main = $to->output;
         
         if( $o->{template_layout} && $o->{template_layout} ne 'none' ){
-            $to = HTML::Template->new(filename => $o->{template_layout});
+            $to = HTML::Template->new(filename => $o->{template_layout}, die_on_bad_params => 0, utf8 => 1);
+            $to->param(%arg);
             $to->param(main => $main);
             $out = $to->output;
         }else{

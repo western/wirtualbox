@@ -22,8 +22,9 @@ if( $ARGV[0] eq 'controller' && $ARGV[1] ){
     print $fl "\n";
     print $fl 'package Controller::'.$pack.";\n";
     print $fl "\n";
-    print $fl 'use WB::Util qw(dumper);';
-    print $fl "\n";
+    print $fl 'use utf8;'."\n";
+    print $fl 'use WB::Util qw(:def);'."\n";
+    print $fl 'use WB::Helper;'."\n";
     print $fl q~
 
 sub index{
