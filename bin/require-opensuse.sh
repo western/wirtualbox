@@ -15,7 +15,9 @@ else
 fi
 
 zypper in -y uwsgi-psgi uwsgi
-zypper in -y perl-HTML-Template perl-Template-Toolkit perl-Crypt-CBC perl-Crypt-Blowfish perl-JSON-XS perl-DBD-Pg perl-DBD-mysql
+zypper in -y perl-HTML-Template perl-Template-Toolkit perl-Crypt-CBC perl-Crypt-Blowfish perl-JSON-XS
+zypper in -y perl-DBD-Pg perl-DBD-mysql
+zypper in -y zypper in perl-Redis redis
 
 cpan HTTP::Entity::Parser
 cpan Cookie::Baker
