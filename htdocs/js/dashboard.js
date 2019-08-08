@@ -8,6 +8,9 @@
   // Graphs
   var ctx = document.getElementById('myChart')
   // eslint-disable-next-line no-unused-vars
+
+if( ctx ){
+  
   var myChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -49,5 +52,7 @@
         display: false
       }
     }
-  })
+  });
+}
+  
 }())
