@@ -151,7 +151,7 @@ sub dispatch{
         );
     }
     my $response = new WB::Response(env=>$o->{env}, template_engine=>$o->{template_engine}, secret=>$o->{secret});
-    my $req = new WB::Request(env=>$o->{env}, response=>$response, secret=>$o->{secret}, db=>$db);
+    my $req = new WB::Request(env=>$o->{env}, response=>$response, secret=>$o->{secret}, db=>$db, vboxmanage=>$o->{vboxmanage});
     
     
     my $found = 0;
@@ -195,8 +195,10 @@ sub dispatch{
         for my $a (@newa){
             
             my @rx_names = ( $a->[1] =~ /<(.+?)>/g );
+            my $path_info = $req->path_info;
+            $path_info =~ s!/$!!g; # truncate last slash
             
-            if( $req->request_method eq $a->[0] && $req->path_info =~ /^$a->[1]$/ ){
+            if( $req->request_method eq $a->[0] && $path_info =~ /^$a->[1]$/ ){
                 
                 #warn '$req->path_info='.$req->path_info.' $a->[1]='.$a->[1];
                 

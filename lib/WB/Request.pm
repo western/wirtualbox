@@ -27,6 +27,13 @@ sub new{
     bless $o, $class;
 }
 
+# virtual methods
+
+sub vboxmanage{
+    my $o = shift;
+    $o->{vboxmanage};
+}
+
 sub db{
     my $o = shift;
     $o->{db};
@@ -36,6 +43,8 @@ sub response{
     my $o = shift;
     $o->{response};
 }
+
+# origin methods
 
 sub charset{
     my $o = shift;

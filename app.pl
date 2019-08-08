@@ -6,8 +6,7 @@ use utf8;
 
 use lib 'lib';
 use WB::Router qw(:def);
-
-
+use VBoxManage;
 
 
 
@@ -24,6 +23,8 @@ my $app = sub {
         
         secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
         
+        vboxmanage => new VBoxManage,
+        
     )->dispatch(
         
         root 'Page::index',
@@ -34,7 +35,8 @@ my $app = sub {
         get {'/auth/logout' => 'Auth::logout'},
         
         get {'/admin' => 'Admin::Page::index'},
-        get {'/admin/order' => 'Admin::Order::index'},
-        get {'/admin/order/list' => 'Admin::Order::list'},
+        get {'/admin/vm/new' => 'Admin::Vm::new'},
+        get {'/admin/vm/:uuid' => 'Admin::Vm::show'},
+        
     );
 };
