@@ -34,9 +34,13 @@ my $app = sub {
         post {'/auth/login' => 'Auth::login'},
         get {'/auth/logout' => 'Auth::logout'},
         
-        get {'/admin' => 'Admin::Page::index'},
         get {'/admin/vm/new' => 'Admin::Vm::new'},
+        post {'/admin/vm' => 'Admin::Vm::create'},
+        get {'/admin/vm/:uuid/edit' => 'Admin::Vm::edit'},
+        get {'/admin/vm/:uuid/del' => 'Admin::Vm::del'},
+        post {'/admin/vm/:uuid' => 'Admin::Vm::update'},
         get {'/admin/vm/:uuid' => 'Admin::Vm::show'},
+        get {'/admin' => 'Admin::Page::index'},
         
     );
 };
