@@ -236,7 +236,7 @@ sub resource($){
         ['GET', '/'.$path.'/new', $pack.'::new'],
         ['POST', '/'.$path, $pack.'::create'],
         ['GET', '/'.$path.'/:id/edit', $pack.'::edit'],
-        ['GET', '/'.$path.'/:id/del', $pack.'::destroy'],
+        ['GET', '/'.$path.'/:id/del', $pack.'::del'],
         ['POST', '/'.$path.'/:id', $pack.'::update'],
         ['GET', '/'.$path.'/:id', $pack.'::show'],
         ['GET', '/'.$path, $pack.'::index'],
