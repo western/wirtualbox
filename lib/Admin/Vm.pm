@@ -31,6 +31,7 @@ sub show{
     $r->response->template_args(
         list_vms => $list_vms,
         vm_dump => dumper($vm),
+        vm => encode_json($vm),
         head_title => 'VM '.$vm->{name},
     );
 }
