@@ -6,6 +6,7 @@ use warnings;
 
 use Carp qw(carp croak);
 use Data::Dumper ();
+use JSON::XS;
 use Exporter 'import';
 use Encode 'find_encoding';
 
@@ -17,9 +18,10 @@ our @EXPORT_OK = (
     qw(decode encode),
     qw(url_escape url_unescape),
     qw(dumper required template_layout),
+    qw(encode_json decode_json),
 );
 
-our %EXPORT_TAGS = (def => [qw(dumper required template_layout)]);
+our %EXPORT_TAGS = (def => [qw(dumper required template_layout encode_json decode_json)]);
 
 
 
