@@ -9,6 +9,7 @@ use Data::Dumper ();
 use JSON::XS;
 use Exporter 'import';
 use Encode 'find_encoding';
+use Term::ANSIColor;
 
 
 # Encoding and pattern cache
@@ -19,11 +20,18 @@ our @EXPORT_OK = (
     qw(url_escape url_unescape),
     qw(dumper required template_layout),
     qw(encode_json decode_json),
+    qw(print_red print_yellow),
 );
 
-our %EXPORT_TAGS = (def => [qw(dumper required template_layout encode_json decode_json)]);
+our %EXPORT_TAGS = (def => [qw(dumper required template_layout encode_json decode_json print_red print_yellow)]);
 
+sub print_red {
+    print color('bold red').join(' ', @_).color('reset');
+}
 
+sub print_yellow {
+    print color('bold yellow').join(' ', @_).color('reset');
+}
 
 sub decode {
     my ($encoding, $bytes) = @_;

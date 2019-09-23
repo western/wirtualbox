@@ -21,4 +21,4 @@ zypper in -y zypper in perl-Redis redis
 
 cpan HTTP::Entity::Parser
 cpan Cookie::Baker
-
+cpan Term::ANSIColor

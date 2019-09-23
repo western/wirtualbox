@@ -17,8 +17,8 @@ my $app = sub {
         env => shift,
         template_engine => 'HTML::Template',
         
-        #db_dsn => 'DBI:mysql:database=test;host=127.0.0.1',
-        #db_login => 'test',
+        #db_dsn      => 'DBI:mysql:database=test;host=127.0.0.1',
+        #db_login    => 'test',
         #db_password => 'test',
         
         secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
@@ -28,19 +28,43 @@ my $app = sub {
     )->dispatch(
         
         root 'Page::index',
-        #resource 'photo',
         
-        get {'/auth' => 'Auth::index'},
-        post {'/auth/login' => 'Auth::login'},
-        get {'/auth/logout' => 'Auth::logout'},
         
-        get {'/admin/vm/new' => 'Admin::Vm::new'},
-        post {'/admin/vm' => 'Admin::Vm::create'},
-        get {'/admin/vm/:uuid/edit' => 'Admin::Vm::edit'},
-        get {'/admin/vm/:uuid/del' => 'Admin::Vm::del'},
-        post {'/admin/vm/:uuid' => 'Admin::Vm::update'},
-        get {'/admin/vm/:uuid' => 'Admin::Vm::show'},
-        get {'/admin' => 'Admin::Page::index'},
+        get(  '/auth'        => 'Auth::index' ),
+        post( '/auth/login'  => 'Auth::login' ),
+        get(  '/auth/logout' => 'Auth::logout' ),
+        
+        
         
     );
 };
+
+
+=head1        
+    
+    example call:
+    ----------------------------------------------------------------------------
+    ->dispatch(
+        
+        root 'Page::index',
+        resource 'photo',
+        
+        get( '/auth'        => 'Auth::index' ),
+        post( '/auth/login' => 'Auth::login' ),
+        get( '/auth/logout' => 'Auth::logout' ),
+        
+        scope('/admin' => [
+            resource 'user',
+            get( '/profile' => 'Page::profile' ),
+            get( '/api'     => 'Admin::Page::api' ),
+            
+            scope('/news' => [
+                get( '/info' => 'News::info' ),
+                get( '/show' => 'News::show' ),
+                
+                resource 'article',
+            ]),
+        ]),
+    );
+    
+=cut        
