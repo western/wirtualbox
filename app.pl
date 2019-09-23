@@ -34,8 +34,13 @@ my $app = sub {
         post( '/auth/login'  => 'Auth::login' ),
         get(  '/auth/logout' => 'Auth::logout' ),
         
+        get('/admin' => 'Admin::Page::index'),
         
-        
+        scope('/admin' => [
+            
+            get('/vm/:uuid' => 'Admin::Vm::show'),
+            get('/vm/new' => 'Admin::Vm::new'),
+        ]),
     );
 };
 

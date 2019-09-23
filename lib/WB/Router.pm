@@ -143,15 +143,21 @@ sub dispatch {
         if ( scalar @t > 1 ) {
             # Vector::Info::index (for Vector::Info)
             $full_path = $cwd.'/lib/'.join('/', @t).'.pm';
-        }else{
+        } else {
             # Auth::index (for Controller::Auth)
+            $pack = 'Controller::'.$pack;
             $full_path = $cwd.'/lib/Controller/'.$t[0].'.pm';
         }
         
         print_red('Package [ ', $pack, $func, ' ] => [ ', $full_path, " ] is not exists\n") unless ( -e $full_path );
         
+        #warn "full_path [$full_path]";
         require $full_path;
-        $a->{template_file} = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+        if ( scalar @t > 1 ) {
+            $a->{template_file} = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+        } else {
+            $a->{template_file} = $cwd.'/template/Controller/'.join('/', @t).'/'.$func.'.html';
+        }
         
         my ($gr1, $gr2) = get_required($cwd, $full_path);
         $a->{require_sub} = sub{ $gr1->$gr2(@_) } if($gr1);
@@ -191,7 +197,7 @@ sub dispatch {
     
     
     
-    
+    #die dumper \@list;
     
     
     
@@ -200,16 +206,18 @@ sub dispatch {
         
         my @rx_names = ( $a->{path} =~ /<(.+?)>/g );
         my $path_info = $req->path_info;
-        $path_info =~ s!/$!!g; # truncate last slash
+        $path_info =~ s!/$!! if ( length($path_info) > 1 ); # truncate last slash
+        
+        #warn "path_info [$path_info] ".dumper($a);
         
         if( $req->request_method eq $a->{method} && $path_info =~ m!^$a->{path}$! ){
             
             my %rx_args = map { $_ => $+{$_} } @rx_names;
             
             $response->template_file($a->{template_file}, $a->{template_layout});
-            if( $a->{require_sub} ){
+            if ( $a->{require_sub} ) {
                 $a->{action_sub}->($req, \%rx_args) if ($a->{require_sub}->($req, \%rx_args));
-            }else{
+            } else {
                 $a->{action_sub}->($req, \%rx_args);
             }
             $found = 1;
