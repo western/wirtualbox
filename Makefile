@@ -20,7 +20,15 @@ getbootstrap:
 	rm bootstrap-4.3.1-dist.zip
 getjquery:
 	cd htdocs/js ; \
+	rm jquery-3.4.1.js ; \
+	wget -O jquery-3.4.1.js https://code.jquery.com/jquery-3.4.1.js ; \
 	rm jquery-3.4.1.min.js ; \
 	wget -O jquery-3.4.1.min.js https://code.jquery.com/jquery-3.4.1.min.js
+getvuejs:
+	cd htdocs/js ; \
+	rm vue.js ; \
+	wget -O vue.js https://vuejs.org/js/vue.js ; \
+	rm vue.min.js ; \
+	wget -O vue.min.js https://vuejs.org/js/vue.min.js
 test:
 	prove
