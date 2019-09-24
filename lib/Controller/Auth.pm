@@ -27,6 +27,7 @@ sub login{
             expires  => '+24h',
             httponly => 1,
             #secure   => 1,
+            samesite => 'strict',
             
             json     => 1,
             crypt    => 1,
@@ -54,6 +55,7 @@ sub logout{
         expires  => '+24h',
         httponly => 1,
         #secure   => 1,
+        samesite => 'strict',
     );
     $r->response->set301('/');
 }

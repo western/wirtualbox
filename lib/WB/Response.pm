@@ -84,6 +84,7 @@ sub header{
         expires  => '+24h',
         httponly => 1,
         secure   => 1,
+        samesite => 'strict', # strict is recommended, see https://habr.com/ru/post/334856/
         
         json     => 0,
         crypt    => 0,
