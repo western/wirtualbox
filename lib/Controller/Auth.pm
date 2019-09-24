@@ -21,13 +21,15 @@ sub login{
     if( $login && $password ){
         
         $r->response->cookie(
-            name => 'auth',
-            value => {login => $login, password => $password},
-            path => '/',
-            expires => '+24h',
+            name     => 'auth',
+            value    => {login => $login, password => $password},
+            path     => '/',
+            expires  => '+24h',
+            httponly => 1,
+            #secure   => 1,
             
-            json => 1,
-            crypt => 1,
+            json     => 1,
+            crypt    => 1,
         );
         
         $r->response->json({
@@ -45,7 +47,14 @@ sub login{
 sub logout{
     my($o, $r, $args) = @_;
     
-    $r->response->cookie(name => 'auth', value => '', path => '/', expires => '+24h',);
+    $r->response->cookie(
+        name     => 'auth',
+        value    => '',
+        path     => '/',
+        expires  => '+24h',
+        httponly => 1,
+        #secure   => 1,
+    );
     $r->response->set301('/');
 }
 

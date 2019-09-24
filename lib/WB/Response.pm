@@ -73,16 +73,20 @@ sub header{
 }
 
 =head1 cookie
-
+    
+    for parameters read the doc https://metacpan.org/pod/Cookie::Baker
+    
     cookie(
-        name => '',
-        value => '',
-        path => '',
-        domain => '',
-        expires => '+24h',
+        name     => '',
+        value    => '',
+        path     => '',
+        domain   => '',
+        expires  => '+24h',
+        httponly => 1,
+        secure   => 1,
         
-        json => 0,
-        crypt => 0,
+        json     => 0,
+        crypt    => 0,
     )
 
 =cut
@@ -90,16 +94,18 @@ sub cookie{
     my $o = shift;
     my %arg = @_;
     
-    if( $arg{json} && $arg{value} ){
+    if ( $arg{json} && $arg{value} ) {
         $arg{value} = JSON::XS->new->utf8->encode($arg{value});
     }
     
-    if( $arg{crypt} && $arg{value} ){
+    if ( $arg{crypt} && $arg{value} ) {
+        
         my $cipher = Crypt::CBC->new(
-            -key => $o->{secret},
+            -key    => $o->{secret},
             -cipher => 'Blowfish'
         );
-        $arg{value} = $cipher->encrypt_hex($arg{value});
+        
+        $arg{value} = $cipher->encrypt_hex( $arg{value} );
     }
     
     push @{$o->{cookie}}, Cookie::Baker::bake_cookie($arg{name}, {
