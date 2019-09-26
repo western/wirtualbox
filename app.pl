@@ -40,6 +40,13 @@ my $app = sub {
             
             get('/vm/:uuid' => 'Admin::Vm::show'),
             get('/vm/new' => 'Admin::Vm::new'),
+            
+            resource 'photo',
+            
+            scope('/admin/inside' => [
+                
+                resource 'doc',
+            ]),
         ]),
     );
 };
@@ -52,22 +59,24 @@ my $app = sub {
     ->dispatch(
         
         root 'Page::index',
-        resource 'photo',
         
-        get( '/auth'        => 'Auth::index' ),
-        post( '/auth/login' => 'Auth::login' ),
-        get( '/auth/logout' => 'Auth::logout' ),
+        
+        get(  '/auth'        => 'Auth::index' ),
+        post( '/auth/login'  => 'Auth::login' ),
+        get(  '/auth/logout' => 'Auth::logout' ),
+        
+        get('/admin' => 'Admin::Page::index'),
         
         scope('/admin' => [
-            resource 'user',
-            get( '/profile' => 'Page::profile' ),
-            get( '/api'     => 'Admin::Page::api' ),
             
-            scope('/news' => [
-                get( '/info' => 'News::info' ),
-                get( '/show' => 'News::show' ),
+            get('/vm/:uuid' => 'Admin::Vm::show'),
+            get('/vm/new' => 'Admin::Vm::new'),
+            
+            resource 'photo',
+            
+            scope('/admin/inside' => [
                 
-                resource 'article',
+                resource 'doc',
             ]),
         ]),
     );

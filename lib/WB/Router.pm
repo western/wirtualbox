@@ -117,7 +117,7 @@ sub get_template_layout {
             get( '/profile' => 'Page::profile' ),
             get( '/api'     => 'Admin::Page::api' ),
             
-            scope('/news' => [
+            scope('/admin/news' => [
                 get( '/info' => 'News::info' ),
                 get( '/show' => 'News::show' ),
                 
@@ -131,7 +131,8 @@ sub dispatch {
     my $self = shift;
     my $cwd  = getcwd();
     
-    my @list = dispatch_flat( dispatch_loop('', \@_) );
+    my @list = dispatch_flat( \@_ );
+    
     
     for my $a ( @list ) {
         
@@ -149,7 +150,7 @@ sub dispatch {
             $full_path = $cwd.'/lib/Controller/'.$t[0].'.pm';
         }
         
-        print_red('Package [ ', $pack, $func, ' ] => [ ', $full_path, " ] is not exists\n") unless ( -e $full_path );
+        print_red('Package [ ', $pack, $func, ' ] => file [ ', $full_path, " ] is not exists\n") unless ( -e $full_path );
         
         #warn "full_path [$full_path]";
         require $full_path;
@@ -169,7 +170,19 @@ sub dispatch {
         # rewrite /admin/vm/:uuid/del  =>  /admin/vm/(?<:uuid>[^/]+)/del
         $a->{path} =~ s!:([^/:]+)!\(?<$1>[^/]+\)!g;
         
-        $a->{action_sub} = sub{ $pack->$func(@_) };
+        
+        if ( $pack->can($func) ) {
+            
+            $a->{action_sub} = sub{ $pack->$func(@_) };
+            
+        } else {
+            
+            print_yellow('Package [ ', $pack, $func, qq~ ] function "$func" is not exists for "$pack"\n~);
+            
+            # make dummy sub for show template without action code
+            $a->{action_sub} = sub{};
+        }
+        
     }
     
     
@@ -197,7 +210,7 @@ sub dispatch {
     
     
     
-    #die dumper \@list;
+    
     
     
     
@@ -208,7 +221,7 @@ sub dispatch {
         my $path_info = $req->path_info;
         $path_info =~ s!/$!! if ( length($path_info) > 1 ); # truncate last slash
         
-        #warn "path_info [$path_info] ".dumper($a);
+        
         
         if( $req->request_method eq $a->{method} && $path_info =~ m!^$a->{path}$! ){
             
@@ -233,39 +246,6 @@ sub dispatch {
     $response->out;
     
     
-}
-
-sub dispatch_loop {
-    my $prefix = shift;
-    my $arr    = shift;
-    
-    for my $a (@{$arr}) {
-        
-        if ( ref $a ne 'ARRAY' && !$prefix ){
-            $prefix = $a->{prefix};
-        }
-        if ( ref $a ne 'ARRAY' && $prefix && $prefix ne $a->{prefix} ){
-            
-            $a->{prefix} = $prefix . $a->{prefix};
-            
-            my @pack = split('/', $a->{prefix});
-            shift @pack;
-            @pack = map { ucfirst $_ } @pack;
-            my $prefix_pack = join('::', @pack);
-            
-            # replace Action for resource only
-            if( $a->{action} && $a->{action} !~ /^$prefix_pack/ && $a->{origin} && $a->{origin} =~ /^resource/ ){
-                $a->{action} = $prefix_pack.'::'.$a->{action};
-            }
-            
-            $a->{path} = $prefix . $a->{path};
-        }
-        if ( ref $a eq 'ARRAY' ){
-            $a = dispatch_loop($prefix, $a);
-        }
-    }
-    
-    $arr;
 }
 
 sub dispatch_flat {
@@ -363,6 +343,13 @@ sub scope {
     for my $a (@{$list}){
         
         if (ref $a eq 'HASH'){
+            if ( $a->{origin} =~ /^resource/ ){
+                my @prefix = split(m!/!, $prefix);
+                shift @prefix;
+                @prefix = map { ucfirst $_ } @prefix;
+                
+                $a->{action} = join('::', @prefix) . '::' . $a->{action};
+            }
             $a->{prefix} = $prefix;
             $a->{path}   = $prefix . $a->{path};
         }
