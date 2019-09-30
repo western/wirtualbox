@@ -108,3 +108,53 @@ my $app = sub {
 * get /admin/vm/new - 'Admin::Vm::new'
 * resource 'photo' - make several actions. See Resource next.
 * /admin/inside/ + /doc/ resource
+## Controller
+Common code of controller:
+```perl
+# file /lib/Controller/Photo.pm
+package Controller::Photo;
+
+use utf8;
+use WB::Util qw(:def);
+
+1;
+```
+Full controller source:
+```perl
+# file /lib/Controller/Photo.pm
+package Controller::Photo;
+
+use utf8;
+use WB::Util qw(:def);
+
+sub new {
+    my($self, $r, $args) = @_;
+}
+
+sub create {
+    my($self, $r, $args) = @_;
+}
+
+sub edit {
+    my($self, $r, $args) = @_;
+}
+
+sub del {
+    my($self, $r, $args) = @_;
+}
+
+sub update {
+    my($self, $r, $args) = @_;
+}
+
+sub show {
+    my($self, $r, $args) = @_;
+}
+
+sub index {
+    my($self, $r, $args) = @_;
+}
+
+1;
+```
+
