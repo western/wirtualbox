@@ -22,7 +22,27 @@ our %EXPORT_TAGS = (
     )]
 );
 
-
+=head2 new
+    
+    Constructor.
+    
+    Example:
+    
+    WB::Router->new(
+        
+        env => $env,
+        template_engine => 'HTML::Template',
+        
+        db_dsn      => 'DBI:mysql:database=test;host=127.0.0.1',
+        db_login    => 'test',
+        db_password => 'test',
+        
+        secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
+        
+        anothermanager => new AnotherManager,
+    )
+    
+=cut
 sub new {
     my $c = shift;
     my $class = ref $c || $c;
@@ -36,6 +56,22 @@ sub new {
     bless $self, $class;
 }
 
+=head2 get_required
+
+    Parser for get "required" pragmas.
+    This pragma set function for required check.
+    
+    Example (code of controller):
+    ----------------------------------------------------------------------------
+    package Controller::Auth;
+    
+    use utf8;
+    use WB::Util qw(:def);
+    
+    required 'App::auth_required';
+    ----------------------------------------------------------------------------
+
+=cut
 sub get_required {
     my $cwd = shift;
     my $file = shift;
@@ -69,6 +105,22 @@ sub get_required {
     undef;
 }
 
+=head2 get_template_layout
+
+    Parser for get "template_layout" pragma.
+    This pragma set main template.
+    
+    Example (controller):
+    ----------------------------------------------------------------------------
+    package Controller::Auth;
+    
+    use utf8;
+    use WB::Util qw(:def);
+    
+    template_layout 'admin'; # or 'none' without
+    ----------------------------------------------------------------------------
+
+=cut
 sub get_template_layout {
     my $file = shift;
     
@@ -87,6 +139,8 @@ sub get_template_layout {
 }
 
 =head2 dispatch
+    
+    Main code for route rules.
     
     arguments:
     ----------------------------------------------------------------------------
