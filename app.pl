@@ -6,6 +6,7 @@ use utf8;
 
 use lib 'lib';
 use WB::Router qw(:def);
+use WB::Util qw(dumper);
 use VBoxManage;
 
 
@@ -47,7 +48,11 @@ my $app = sub {
                 
                 resource 'doc',
             ]),
+            
+            resource 'user',
         ]),
+        
+        
     );
 };
 

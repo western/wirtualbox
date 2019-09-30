@@ -7,18 +7,18 @@ use WB::Util qw(dumper template_layout);
 template_layout 'none';
 
 
-sub index{
-    my($o, $r, $args) = @_;
+sub index {
+    my($self, $r, $args) = @_;
     
     
 }
 
-sub login{
-    my($o, $r, $args) = @_;
+sub login {
+    my($self, $r, $args) = @_;
     
     my($login, $password) = $r->param('login', 'password');
     
-    if( $login && $password ){
+    if ( $login && $password ) {
         
         $r->response->cookie(
             name     => 'auth',
@@ -37,7 +37,7 @@ sub login{
             code => 'ok',
         });
         
-    }else{
+    } else {
         $r->response->json({
             code => 'err',
             err => ['Логин или пароль неверен'],
@@ -45,8 +45,8 @@ sub login{
     }
 }
 
-sub logout{
-    my($o, $r, $args) = @_;
+sub logout {
+    my($self, $r, $args) = @_;
     
     $r->response->cookie(
         name     => 'auth',

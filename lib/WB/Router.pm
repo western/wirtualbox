@@ -12,10 +12,15 @@ use WB::Util qw(:def);
 use Exporter 'import';
 use Cwd;
 
-our @EXPORT_OK = (
-    qw(root resource get post scope)
+our @EXPORT_OK = (qw(
+    root resource get post scope
+));
+
+our %EXPORT_TAGS = (
+    def => [qw(
+        root resource get post scope
+    )]
 );
-our %EXPORT_TAGS = (def => [qw(root resource get post scope)]);
 
 
 sub new {
@@ -131,10 +136,10 @@ sub dispatch {
     my $self = shift;
     my $cwd  = getcwd();
     
-    my @list = dispatch_flat( \@_ );
+    @{$self->{list}} = dispatch_flat( \@_ );
     
     
-    for my $a ( @list ) {
+    for my $a ( @{$self->{list}} ) {
         
         my @t = split(/::/, $a->{action});
         my $func = pop @t;
@@ -150,9 +155,8 @@ sub dispatch {
             $full_path = $cwd.'/lib/Controller/'.$t[0].'.pm';
         }
         
-        print_red('Package [ ', $pack, $func, ' ] => file [ ', $full_path, " ] is not exists\n") unless ( -e $full_path );
+        println_red('Package [', $pack, $func, '] => file [', $full_path, "] is not exists. See route ", dumper($a)) unless ( -e $full_path );
         
-        #warn "full_path [$full_path]";
         require $full_path;
         if ( scalar @t > 1 ) {
             $a->{template_file} = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
@@ -177,7 +181,7 @@ sub dispatch {
             
         } else {
             
-            print_yellow('Package [ ', $pack, $func, qq~ ] function "$func" is not exists for "$pack"\n~);
+            println_yellow('Package [', $pack, $func, qq~] function "$func" is not exists for "$pack"~);
             
             # make dummy sub for show template without action code
             $a->{action_sub} = sub{};
@@ -215,7 +219,7 @@ sub dispatch {
     
     
     my $found = 0;
-    for my $a ( @list ) {
+    for my $a ( @{$self->{list}} ) {
         
         my @rx_names = ( $a->{path} =~ /<(.+?)>/g );
         my $path_info = $req->path_info;
