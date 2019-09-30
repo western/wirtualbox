@@ -1,5 +1,6 @@
 # Thing
 ##### Thing is a yet another [small] [editable] [mobility] perl web [PSGI] framework with [predeclared behaviour]
+##### Inspired by [Rambler X-Ware 3] [ruby rails] [perl Catalyst] [perl Mojo]
 ##### Small - all current version code contained in several packages:
 * DB
 * File - Class support for upload files
