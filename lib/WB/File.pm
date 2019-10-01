@@ -10,7 +10,7 @@ sub new{
     my $class = ref $c || $c;
     my %arg = @_;
     
-    my $o = {
+    my $self = {
         filename => '',
         ext => '',
         size => 0,
@@ -18,66 +18,66 @@ sub new{
         %arg,
     };
     
-    if( $o->{filename} && $o->{filename} =~ m!([^.]+)$!i ){
-        $o->{ext} = $1;
+    if( $self->{filename} && $self->{filename} =~ m!([^.]+)$!i ){
+        $self->{ext} = $1;
         
-        if( $o->{filename} =~ m!\.(tar\.gz)$!i ){
-            $o->{ext} = $1;
+        if( $self->{filename} =~ m!\.(tar\.gz)$!i ){
+            $self->{ext} = $1;
         }
     }
     
-    bless $o, $class;
+    bless $self, $class;
 }
 
 sub filename{
-    my $o = shift;
-    $o->{filename};
+    my $self = shift;
+    $self->{filename};
 }
 
 sub ext{
-    my $o = shift;
-    $o->{ext};
+    my $self = shift;
+    $self->{ext};
 }
 
 sub size{
-    my $o = shift;
-    $o->{size};
+    my $self = shift;
+    $self->{size};
 }
 
 sub tempname{
-    my $o = shift;
-    $o->{tempname};
+    my $self = shift;
+    $self->{tempname};
 }
 
 sub upload_to{
-    my $o = shift;
+    my $self = shift;
     my %arg = @_;
     
     my $save_full_name = '';
     if( $arg{path} ){
-        $save_full_name = $arg{path}.'/'.$o->{filename};
+        $save_full_name = $arg{path}.'/'.$self->{filename};
     }
     if( $arg{full_path} ){
         $save_full_name = $arg{full_path};
     }
     
-    if( $o->{filename} && $o->{size} && $o->{tempname} && -f $o->{tempname} && $save_full_name ){
+    if( $self->{filename} && $self->{size} && $self->{tempname} && -f $self->{tempname} && $save_full_name ){
         
         if( -f $save_full_name ){
             return 0 if !$arg{rewrite};
             unlink $save_full_name or warn "Could not unlink $save_full_name: $!";
         }
         
-        open my $in, '<', $o->{tempname} or die $!;
-        open my $out, '>', $save_full_name or die $!;
+        open my $in, '<', $self->{tempname} or die $!;
+        open my $selfut, '>', $save_full_name or die $!;
         
         binmode $in;
-        binmode $out;
+        binmode $selfut;
         
-        print $out $_ while(<$in>);
+        print $selfut $_ while(<$in>);
         
         close $in;
-        close $out;
+        close $selfut;
         return 1;
     }
     

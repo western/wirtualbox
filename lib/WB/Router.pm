@@ -154,6 +154,7 @@ sub get_template_layout {
             action          => 'Auth::login',
             action_sub      => sub{},
             require_sub     => sub{},
+            template_change => 'default', # default, action
             template_file   => '',
             template_layout => '',
         },
@@ -213,9 +214,9 @@ sub dispatch {
         
         require $full_path;
         if ( scalar @t > 1 ) {
-            $a->{template_file} = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+            $a->{template_file}   = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
         } else {
-            $a->{template_file} = $cwd.'/template/Controller/'.join('/', @t).'/'.$func.'.html';
+            $a->{template_file}   = $cwd.'/template/Controller/'.join('/', @t).'/'.$func.'.html';
         }
         
         my ($gr1, $gr2) = get_required($cwd, $full_path);
@@ -285,12 +286,23 @@ sub dispatch {
             
             my %rx_args = map { $_ => $+{$_} } @rx_names;
             
-            $response->template_file($a->{template_file}, $a->{template_layout});
+            $response->{template_object}->{route}           = $a;
+            $response->{template_object}->{template_change} = 'default';
+            $response->{template_object}->{template_file}   = $a->{template_file};
+            $response->{template_object}->{template_layout} = $a->{template_layout};
+            #die dumper $response;
+            
             if ( $a->{require_sub} ) {
                 $a->{action_sub}->($req, \%rx_args) if ($a->{require_sub}->($req, \%rx_args));
             } else {
                 $a->{action_sub}->($req, \%rx_args);
             }
+            
+            #die dumper $response->{route};
+            #die dumper $response;
+            
+            $response->template_file($a->{template_file}, $a->{template_layout}) if ( $response->{template_object}->{template_change} eq 'default' );
+            
             $found = 1;
             last;
         }

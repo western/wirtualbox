@@ -17,59 +17,59 @@ sub new{
     my $class = ref $c || $c;
     my %arg = @_;
     
-    my $o = {
-        code => 200,
+    my $self = {
+        code   => 200,
         header => [],
         cookie => [],
-        body => [],
+        body   => [],
         
         template_engine => '',
         template_object => undef,
-        template_args => {},
-        mode => 'body', # body, template, json
+        template_args   => {},
+        mode            => 'body', # body, template, json
         %arg,
     };
     
-    if( scalar @{$o->{header}} == 0 ){
-        push @{$o->{header}}, ('Content-type', 'text/html;charset=utf-8');
-        push @{$o->{header}}, ('X-WB', '1');
+    if ( scalar @{$self->{header}} == 0 ) {
+        push @{$self->{header}}, ('Content-type', 'text/html;charset=utf-8');
+        push @{$self->{header}}, ('X-WB', '1');
     }
     
-    if( $o->{template_engine} ){
+    if ( $self->{template_engine} ) {
         
         my $t = new WB::Template(
-            template_engine => $o->{template_engine},
+            template_engine => $self->{template_engine},
         );
         $t->init();
         
-        $o->{template_object} = $t;
-        $o->{mode} = 'template';
+        $self->{template_object} = $t;
+        $self->{mode}            = 'template';
     }
     
-    bless $o, $class;
+    bless $self, $class;
 }
 
 sub mode{
-    my $o = shift;
+    my $self = shift;
     my $arg = shift;
-    $o->{mode} = $arg if ($arg);
-    $o->{mode};
+    $self->{mode} = $arg if ($arg);
+    $self->{mode};
 }
 
 sub code{
-    my $o = shift;
+    my $self = shift;
     my $arg = shift;
-    $o->{code} = $arg if ($arg);
-    $o->{code};
+    $self->{code} = $arg if ($arg);
+    $self->{code};
 }
 
 sub header{
-    my $o = shift;
+    my $self = shift;
     my $name = shift;
     my $value = shift;
     
-    push @{$o->{header}}, ($name, $value) if ($name);
-    $o->{header};
+    push @{$self->{header}}, ($name, $value) if ($name);
+    $self->{header};
 }
 
 =head1 cookie
@@ -92,7 +92,7 @@ sub header{
 
 =cut
 sub cookie{
-    my $o = shift;
+    my $self = shift;
     my %arg = @_;
     
     if ( $arg{json} && $arg{value} ) {
@@ -102,106 +102,107 @@ sub cookie{
     if ( $arg{crypt} && $arg{value} ) {
         
         my $cipher = Crypt::CBC->new(
-            -key    => $o->{secret},
+            -key    => $self->{secret},
             -cipher => 'Blowfish'
         );
         
         $arg{value} = $cipher->encrypt_hex( $arg{value} );
     }
     
-    push @{$o->{cookie}}, Cookie::Baker::bake_cookie($arg{name}, {
+    push @{$self->{cookie}}, Cookie::Baker::bake_cookie($arg{name}, {
         %arg,
     });
 }
 
 sub body{
-    my $o = shift;
+    my $self = shift;
     
-    push @{$o->{body}}, @_ if (@_);
-    $o->{body};
+    push @{$self->{body}}, @_ if (@_);
+    $self->{body};
 }
 
 sub json{
-    my $o = shift;
-    $o->{mode} = 'json';
+    my $self = shift;
+    $self->{mode} = 'json';
     
-    push @{$o->{body}}, @_ if (@_);
-    $o->{body};
+    push @{$self->{body}}, @_ if (@_);
+    $self->{body};
 }
 
 sub template_file($$){
-    my $o = shift;
+    my $self = shift;
     my $file = shift;
     my $template_main = shift;
-    my $to = $o->{template_object};
+    my $to = $self->{template_object};
     
     if( $file && $to ){
+        $to->{template_change} = 'action';
         $to->template_file( $file, $template_main );
     }
 }
 
 sub template_args{
-    my $o = shift;
+    my $self = shift;
     my %args = @_;
     
-    $o->{template_args} = \%args if (@_);
-    $o->{template_args};
+    $self->{template_args} = \%args if (@_);
+    $self->{template_args};
 }
 
 sub set404{
-    my $o = shift;
-    $o->{mode} = 'body';
-    $o->{code} = 404;
-    $o->{body} = [
+    my $self = shift;
+    $self->{mode} = 'body';
+    $self->{code} = 404;
+    $self->{body} = [
         '<h1>404 Not Found</h1><hr>',
-        $o->{env}{PATH_INFO},
+        $self->{env}{PATH_INFO},
     ];
 }
 
 sub set301{
-    my $o = shift;
+    my $self = shift;
     my $goto = shift;
     
-    $o->{header} = ['cache-control', 'no-cache', 'Location', $goto];
+    $self->{header} = ['cache-control', 'no-cache', 'Location', $goto];
     
-    $o->{mode} = 'body';
-    $o->{code} = 301;
-    $o->{body} = [];
+    $self->{mode} = 'body';
+    $self->{code} = 301;
+    $self->{body} = [];
 }
 
 sub set403{
-    my $o = shift;
-    $o->{mode} = 'body';
-    $o->{code} = 403;
-    $o->{body} = [
+    my $self = shift;
+    $self->{mode} = 'body';
+    $self->{code} = 403;
+    $self->{body} = [
         '<h1>403 Forbidden</h1><hr>',
-        $o->{env}{PATH_INFO},
+        $self->{env}{PATH_INFO},
     ];
 }
 
 sub out{
-    my $o = shift;
-    my $body = $o->{body};
+    my $self = shift;
+    my $body = $self->{body};
     
-    if( $o->{mode} eq 'template' ){
-        $body = [ $o->{template_object}->process( %{$o->{template_args}} ) ];
+    if( $self->{mode} eq 'template' ){
+        $body = [ $self->{template_object}->process( %{$self->{template_args}} ) ];
     }
     
-    if( $o->{mode} eq 'json' ){
-        $o->{header} = [];
-        push @{$o->{header}}, ('Content-type', 'application/json;charset=utf-8');
-        push @{$o->{header}}, ('X-WB', '1');
+    if( $self->{mode} eq 'json' ){
+        $self->{header} = [];
+        push @{$self->{header}}, ('Content-type', 'application/json;charset=utf-8');
+        push @{$self->{header}}, ('X-WB', '1');
         
         $body = [ JSON::XS->new->utf8->encode($body->[0]) ];
     }
     
-    for my $c (@{$o->{cookie}}){
-        unshift @{$o->{header}}, 'Set-Cookie' => $c;
+    for my $c (@{$self->{cookie}}){
+        unshift @{$self->{header}}, 'Set-Cookie' => $c;
     }
     
     return [
-        $o->{code},
-        $o->{header},
+        $self->{code},
+        $self->{header},
         $body,
     ];
 }

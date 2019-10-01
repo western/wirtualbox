@@ -18,71 +18,71 @@ sub new{
     my $class = ref $c || $c;
     my %arg = @_;
     
-    my $o = {
+    my $self = {
         env => {},
         charset => 'UTF-8',
         %arg,
     };
     
-    bless $o, $class;
+    bless $self, $class;
 }
 
 # virtual methods
 
 sub vboxmanage{
-    my $o = shift;
-    $o->{vboxmanage};
+    my $self = shift;
+    $self->{vboxmanage};
 }
 
 sub db{
-    my $o = shift;
-    $o->{db};
+    my $self = shift;
+    $self->{db};
 }
 
 sub response{
-    my $o = shift;
-    $o->{response};
+    my $self = shift;
+    $self->{response};
 }
 
 # origin methods
 
 sub charset{
-    my $o = shift;
-    $o->{charset};
+    my $self = shift;
+    $self->{charset};
 }
 
 sub path_info{
-    my $o = shift;
-    $o->{env} && $o->{env}{PATH_INFO} ? $o->{env}{PATH_INFO} : undef;
+    my $self = shift;
+    $self->{env} && $self->{env}{PATH_INFO} ? $self->{env}{PATH_INFO} : undef;
 }
 
 sub http_referer{
-    my $o = shift;
-    $o->{env} && $o->{env}{HTTP_REFERER} ? $o->{env}{HTTP_REFERER} : undef;
+    my $self = shift;
+    $self->{env} && $self->{env}{HTTP_REFERER} ? $self->{env}{HTTP_REFERER} : undef;
 }
 
 sub request_method{
-    my $o = shift;
-    $o->{env} && $o->{env}{REQUEST_METHOD} ? $o->{env}{REQUEST_METHOD} : undef;
+    my $self = shift;
+    $self->{env} && $self->{env}{REQUEST_METHOD} ? $self->{env}{REQUEST_METHOD} : undef;
 }
 
 sub remote_addr{
-    my $o = shift;
-    $o->{env} && $o->{env}{REMOTE_ADDR} ? $o->{env}{REMOTE_ADDR} : undef;
+    my $self = shift;
+    $self->{env} && $self->{env}{REMOTE_ADDR} ? $self->{env}{REMOTE_ADDR} : undef;
 }
 
 sub _param_parse{
-    my $o = shift;
+    my $self = shift;
     
     #print "_param_parse\n";
     
-    if( $o->{env} && $o->{env}{REQUEST_METHOD} eq 'GET' && length $o->{env}{QUERY_STRING} ){
-        my $param = $o->{param} = [];
-        my $charset = $o->charset;
+    if( $self->{env} && $self->{env}{REQUEST_METHOD} eq 'GET' && length $self->{env}{QUERY_STRING} ){
+        my $param = $self->{param} = [];
+        my $charset = $self->charset;
         
         #print "_GET_parse\n";
         
-        for my $pair (split '&', $o->{env}{QUERY_STRING}) {
+        for my $pair (split '&', $self->{env}{QUERY_STRING}) {
             next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
             my ($name, $value) = ($1, $2 // '');
             
@@ -97,12 +97,12 @@ sub _param_parse{
         }
     }
     
-    if( $o->{env} && $o->{env}{REQUEST_METHOD} eq 'POST' ){
+    if( $self->{env} && $self->{env}{REQUEST_METHOD} eq 'POST' ){
         
         #print "_POST_parse\n";
         
         my $length = 0;
-        if ($o->{env}{'psgix.input.buffered'}) {
+        if ($self->{env}{'psgix.input.buffered'}) {
             $length = 1024 * 1024; # 1MB for buffered
         } else {
             $length = 1024 * 64; # 64K for unbuffered
@@ -112,7 +112,7 @@ sub _param_parse{
         $parser->register('application/x-www-form-urlencoded', 'HTTP::Entity::Parser::UrlEncoded');
         $parser->register('multipart/form-data', 'HTTP::Entity::Parser::MultiPart');
         
-        if( my(@args) = $parser->parse($o->{env}) ){
+        if( my(@args) = $parser->parse($self->{env}) ){
             
             #print 'parser_dumper='.dumper(\@args);
             
@@ -129,26 +129,26 @@ sub _param_parse{
                 );
             }
             
-            $o->{param} = [@{$args[0]}, @b];
+            $self->{param} = [@{$args[0]}, @b];
         }
         
     }
 }
 
 sub param{
-    my $o = shift;
+    my $self = shift;
     my @names = @_;
     
     
     
-    #print '1. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
+    #print '1. pid='.$$.' path_info='.$self->path_info.' '.dumper($self->{param});
     
-    $o->_param_parse if !$o->{param};
+    $self->_param_parse if !$self->{param};
     
-    #print '2. pid='.$$.' path_info='.$o->path_info.' '.dumper($o->{param});
+    #print '2. pid='.$$.' path_info='.$self->path_info.' '.dumper($self->{param});
     
     my @values;
-    my $param = $o->{param} || [];
+    my $param = $self->{param} || [];
     for (my $i = 0; $i < @$param; $i += 2) {
         #push @values, $param->[$i + 1] if $param->[$i] eq $name;
         push @values, $param->[$i + 1] if grep(/^$param->[$i]$/, @names);
@@ -163,19 +163,19 @@ sub param{
 }
 
 sub cookie{
-    my $o = shift;
+    my $self = shift;
     my $name = shift;
     my %arg = @_;
     
-    return undef unless($o->{env}{HTTP_COOKIE});
+    return undef unless($self->{env}{HTTP_COOKIE});
     
-    $o->{cookie} = Cookie::Baker::crush_cookie($o->{env}{HTTP_COOKIE}) unless($o->{cookie});
+    $self->{cookie} = Cookie::Baker::crush_cookie($self->{env}{HTTP_COOKIE}) unless($self->{cookie});
     
-    my $ret = $o->{cookie}{$name};
+    my $ret = $self->{cookie}{$name};
     
     if( $arg{decrypt} && $ret ){
         my $cipher = Crypt::CBC->new(
-            -key => $o->{secret},
+            -key => $self->{secret},
             -cipher => 'Blowfish',
         );
         $ret = $cipher->decrypt_hex($ret);

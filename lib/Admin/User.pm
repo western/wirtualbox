@@ -8,6 +8,24 @@ use MIME::Base64;
 required 'Application::auth_required';
 template_layout 'admin2';
 
+sub index {
+    my($self, $r, $args) = @_;
+    
+#     $r->response->template_file(
+#         'template_file', 'template_layout'
+#     );
+    
+#     $r->response->template_file(
+#         'template_file'
+#     );
+    
+    
+    $r->response->json({
+        code => 'non_ok',
+        msg => 'hi',
+    });
+}
+
 sub create {
     my($self, $r, $args) = @_;
     

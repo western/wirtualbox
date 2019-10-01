@@ -103,7 +103,7 @@ my $app = sub {
 * get /auth - ```/lib/Controller/Auth.pm```
 * post /auth/login
 * get /auth/logout - 'Auth::logout' if you declare "one package name and one action" - path is /lib/Controller/Auth
-* get /admin - ```/lib/Admin/Page.pm``` - 'Admin::Page::index' if you set "several package names and one action" - path is ```/lib/Full/Package/Name.pm```
+* get /admin - ```/lib/Admin/Page.pm``` - 'Admin::Page::index' if you set "several package names Admin::Page:: and one action" - path is ```/lib/Admin/Page.pm```
 * get /admin/vm/:uuid - 'Admin::Vm::show' with param 'uuid' ( $args->{uuid} )
 * get /admin/vm/new - 'Admin::Vm::new'
 * resource 'photo' - make several actions. See Resource next.
@@ -126,6 +126,9 @@ package Controller::Photo;
 
 use utf8;
 use WB::Util qw(:def);
+
+required 'App::auth_required'; # Controller::App with action "auth_required"
+template_layout 'admin';       # main template
 
 sub new {
     my($self, $r, $args) = @_;
@@ -158,3 +161,106 @@ sub index {
 1;
 ```
 
+### Action arguments
+
+app.pl
+```perl
+
+get('/photo/some/:uuid' => 'Photo::some_change'),
+
+```
+
+Controller:
+```perl
+# file /lib/Controller/Photo.pm
+package Controller::Photo;
+
+use utf8;
+use WB::Util qw(:def);
+
+sub some_change {
+    my($self, $r, $args) = @_;
+    
+    warn $args->{uuid};
+    
+}
+```
+
+### Templates
+
+By default you can create only package empty. And templates will be use.
+
+```perl
+# file /lib/Controller/Photo.pm
+package Controller::Photo;
+
+use utf8;
+use WB::Util qw(:def);
+
+sub some_change {
+    my($self, $r, $args) = @_;
+    
+    # by default, system get find /template/Controller/Photo/some_change.html
+    # and 'main' layout
+    $r->response->template_args(
+        head_title => 'some title of page',
+    );
+}
+```
+
+Controller:
+```perl
+# file /lib/Controller/Photo.pm
+package Controller::Photo;
+
+use utf8;
+use WB::Util qw(:def);
+
+template_layout 'admin';  # main template
+#template_layout 'none';  # continue without main template
+# if you do not set template_layout, system set by default 'main'
+
+# define   /photo/some/:uuid
+# and call /photo/some/111-222-333
+sub some_change {
+    my($self, $r, $args) = @_;
+    
+    if ( $args->{uuid} ) {
+        
+        # by default, system get find /template/Controller/Photo/some_change.html
+        $r->response->template_args(
+            list       => [1, 2, 3],
+            uuid       => $args->{uuid},
+            head_title => 'some title of page',
+        );
+        
+        # but you can change template file
+        $r->response->template_file(
+            'template_file', 'template_layout'
+        );
+    }
+}
+```
+
+Send json data:
+```perl
+# file /lib/Controller/Photo.pm
+package Controller::Photo;
+
+use utf8;
+use WB::Util qw(:def);
+
+sub some_change {
+    my($self, $r, $args) = @_;
+    
+    if ( $args->{uuid} ) {
+        
+        # send content-type: application/json;charset=utf-8
+        # and json data
+        $r->response->json({
+            name1 => 'xtra',
+            val2  => 95,
+        });
+    }
+}
+```

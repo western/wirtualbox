@@ -6,94 +6,135 @@ use warnings;
 
 use WB::Util qw(dumper);
 
+use Cwd;
+
 
 sub new{
     my $c = shift;
     my $class = ref $c || $c;
     my %arg = @_;
     
-    my $o = {
+    my $self = {
         template_engine => 'Template',
         template_object => undef,
         template_layout => '',
-        template_file => '',
+        template_file   => '',
         %arg,
     };
     
-    bless $o, $class;
+    bless $self, $class;
 }
 
 sub init{
-    my $o = shift;
+    my $self = shift;
     
-    if( $o->{template_engine} eq 'Template' ){
+    if( $self->{template_engine} eq 'Template' ){
         
         require Template;
         
-        $o->{template_object} = Template->new({
+        $self->{template_object} = Template->new({
             INCLUDE_PATH => '/tmp',
             INTERPOLATE  => 0,
             ABSOLUTE     => 1,
         }) or die $Template::ERROR;
     }
     
-    if( $o->{template_engine} eq 'HTML::Template' ){
+    if( $self->{template_engine} eq 'HTML::Template' ){
         
         require HTML::Template;
         
-        #$o->{template_object} = HTML::Template->new(filename  => 'template.tmpl');
+        #$self->{template_object} = HTML::Template->new(filename  => 'template.tmpl');
     }
 }
 
 sub template_file{
-    my $o = shift;
+    my $self = shift;
+    my $cwd  = getcwd();
+    $cwd .= '/template';
     
-    $o->{template_file} = $_[0] if ($_[0]);
-    $o->{template_layout} = $_[1] if ($_[1]);
+    $self->{template_file}   = $_[0] if ($_[0]);
+    $self->{template_layout} = $_[1] if ($_[1]);
     
-    if( $o->{template_layout} && $o->{template_layout} =~ m!none\.html$! ){
-        $o->{template_layout} = 'none';
+    if( $self->{template_layout} && $self->{template_layout} =~ m!none\.html$! ){
+        $self->{template_layout} = 'none';
     }
     
-    wantarray ? ($o->{template_file}, $o->{template_layout}) : $o->{template_file};
+    
+    for my $n (qw(template_file template_layout)) {
+        
+        if( $self->{$n} && !-e $self->{$n} ){
+            
+            my $result_path;
+            
+            # if layout
+            if ( !$result_path && -e $cwd.'/'.$self->{$n}.'.html' ) {
+                $result_path = $cwd.'/'.$self->{$n}.'.html';
+                warn "$n set $result_path";
+            }
+            
+            # if set simple name "template_file"
+            my $route = $self->{route};
+            if ( !$result_path && $route && $route->{action} ) {
+                
+                my @t = split(/::/, $route->{action});
+                my $func = pop @t;
+                my $pack = join('::', @t);
+                
+                if ( scalar @t > 1 ) {
+                    $result_path = $cwd.'/'.join('/', @t).'/'.$self->{$n}.'.html';
+                    warn "$n set $result_path";
+                } else {
+                    $result_path = $cwd.'/Controller/'.join('/', @t).'/'.$self->{$n}.'.html';
+                    warn "$n set $result_path";
+                }
+            }
+            
+            if ( $result_path && -e $result_path ) {
+                $self->{$n} = $result_path;
+                warn "$n set $result_path";
+            }
+        }
+    }
+    
+    wantarray ? ($self->{template_file}, $self->{template_layout}) : $self->{template_file};
 }
 
 sub process{
-    my $o = shift;
+    my $self = shift;
     my %arg = @_;
-    my $to = $o->{template_object};
-    my $out;
+    my $to = $self->{template_object};
+    my $selfut;
     
-    if( $to && $o->{template_engine} eq 'Template' ){
+    if( $to && $self->{template_engine} eq 'Template' ){
         
         my $main = '';
-        $to->process($o->{template_file}, \%arg, \$main) or die $to->error();
+        $to->process($self->{template_file}, \%arg, \$main) or die $to->error();
         
-        if( $o->{template_layout} && $o->{template_layout} ne 'none' ){
+        if( $self->{template_layout} && $self->{template_layout} ne 'none' ){
             $arg{main} = $main;
-            $to->process($o->{template_layout}, \%arg, \$out) or die $to->error();
+            $to->process($self->{template_layout}, \%arg, \$selfut) or die $to->error();
         }else{
-            $out = $main;
+            $selfut = $main;
         }
     }
     
-    if( $o->{template_engine} eq 'HTML::Template' ){
+    if( $self->{template_engine} eq 'HTML::Template' ){
         
-        $to = HTML::Template->new(filename => $o->{template_file}, die_on_bad_params => 0, utf8 => 1);
+        $to = HTML::Template->new(filename => $self->{template_file}, die_on_bad_params => 0, utf8 => 1);
         $to->param(%arg);
         my $main = $to->output;
         
-        if( $o->{template_layout} && $o->{template_layout} ne 'none' ){
-            $to = HTML::Template->new(filename => $o->{template_layout}, die_on_bad_params => 0, utf8 => 1);
+        if( $self->{template_layout} && $self->{template_layout} ne 'none' ){
+            $to = HTML::Template->new(filename => $self->{template_layout}, die_on_bad_params => 0, utf8 => 1);
             $to->param(%arg);
             $to->param(main => $main);
-            $out = $to->output;
+            $selfut = $to->output;
         }else{
-            $out = $main;
+            $selfut = $main;
         }
     }
     
-    $out;
+    $selfut;
 }
 
 1;
