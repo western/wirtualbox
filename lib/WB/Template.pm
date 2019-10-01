@@ -91,7 +91,7 @@ sub template_file{
             
             if ( $result_path && -e $result_path ) {
                 $self->{$n} = $result_path;
-                warn "$n set $result_path";
+                warn "$n is $result_path";
             }
         }
     }

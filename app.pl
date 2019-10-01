@@ -24,7 +24,7 @@ my $app = sub {
         
         secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
         
-        vboxmanage => new VBoxManage,
+        #vboxmanage => new VBoxManage,
         
     )->dispatch(
         
@@ -50,6 +50,7 @@ my $app = sub {
             ]),
             
             resource 'user',
+            resource 'article',
         ]),
         
         

@@ -20,10 +20,10 @@ sub index {
 #     );
     
     
-    $r->response->json({
-        code => 'non_ok',
-        msg => 'hi',
-    });
+#     $r->response->json({
+#         code => 'non_ok',
+#         msg => 'hi',
+#     });
 }
 
 sub create {

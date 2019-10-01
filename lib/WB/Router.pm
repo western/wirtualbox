@@ -264,7 +264,7 @@ sub dispatch {
         response   => $response,
         secret     => $self->{secret},
         db         => $db,
-        vboxmanage => $self->{vboxmanage},
+        #vboxmanage => $self->{vboxmanage},
     );
     
     
