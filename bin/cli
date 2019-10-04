@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use lib 'lib';
+use lib '../lib';
+use WB::CLI;
+use WB::Util qw(:def);
+
+
+warn "($ARGV[0]) ($ARGV[1]) ($ARGV[2]) ($ARGV[3]) ";
+
+if ( $ARGV[0] && $ARGV[0] eq 'model' && $ARGV[1] && $ARGV[1] eq 'autogenerate' ){
+    
+    println_yellow("model autogenerate");
+}
