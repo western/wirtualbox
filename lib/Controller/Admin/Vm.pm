@@ -1,16 +1,16 @@
 
-package Admin::Vm;
+package Controller::Admin::Vm;
 
 use utf8;
 use WB::Util qw(:def);
 use Controller::Helper;
 
-required 'Application::auth_required';
+required 'App::auth_required';
 template_layout 'admin';
 
 
 sub show{
-    my($o, $r, $args) = @_;
+    my($self, $r, $args) = @_;
     
     my $vm = $r->vboxmanage->info_vm(UUID => $args->{uuid});
     $r->response->set404 if ( !$vm );
@@ -37,7 +37,7 @@ sub show{
 }
 
 sub new{
-    my($o, $r, $args) = @_;
+    my($self, $r, $args) = @_;
     
     $r->response->template_args(
         list_vms => $r->vboxmanage->list_vms,

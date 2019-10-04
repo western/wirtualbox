@@ -1014,4 +1014,55 @@ insert into orders(title, from_name, from_address, to_address, registered) value
 insert into orders(title, from_name, from_address, to_address, registered) values('gTLiR3Ars8JpTOZ4t2Kk KaUxe','wVXE25qgjkO6a qTOXLUBKKJQi','Wxe4iIELWHPoWMbCriqZAU1KUV','V1iEDVyqStSdjbYcf4OLJJaXDF',now());
 
 
+drop table if exists users;
+
+create table users(
+    id int unsigned not null primary key auto_increment,
+    login varchar(50) not null default '',
+    password varchar(50) not null default '',
+    name varchar(512) not null default '',
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+insert into users(login, password, name, registered) values('login1', 'password1', 'name1', now());
+insert into users(login, password, name, registered) values('login2', 'password2', 'name2', now());
+insert into users(login, password, name, registered) values('login3', 'password3', 'name3', now());
+
+
+drop table if exists articles;
+
+create table articles(
+    id int unsigned not null primary key auto_increment,
+    user_id int unsigned not null default 0,
+    title varchar(512) not null default '',
+    body text,
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+insert into articles(user_id, title, body, registered) values(1, 'title1', 'body1', now());
+insert into articles(user_id, title, body, registered) values(1, 'title2', 'body2', now());
+insert into articles(user_id, title, body, registered) values(2, 'title3', 'body3', now());
+insert into articles(user_id, title, body, registered) values(2, 'title4', 'body4', now());
+insert into articles(user_id, title, body, registered) values(2, 'title5', '{"n":"name1","v":"value2"}', now());
+
+
+
+drop table if exists comments;
+
+create table comments(
+    id int unsigned not null primary key auto_increment,
+    article_id int unsigned not null default 0,
+    user_id int unsigned not null default 0,
+    body text,
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment1', now());
+insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment2', now());
+insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment3', now());
+insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment4', now());
+
 

@@ -18,9 +18,9 @@ my $app = sub {
         env => shift,
         template_engine => 'HTML::Template',
         
-        #db_dsn      => 'DBI:mysql:database=test;host=127.0.0.1',
-        #db_login    => 'test',
-        #db_password => 'test',
+        db_dsn      => 'DBI:mysql:database=test;host=127.0.0.1',
+        db_login    => 'test',
+        db_password => 'test',
         
         secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
         

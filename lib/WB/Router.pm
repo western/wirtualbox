@@ -7,10 +7,13 @@ use warnings;
 use WB::Request;
 use WB::Response;
 use WB::DB;
+use WB::Model;
 use WB::Util qw(:def);
 
 use Exporter 'import';
 use Cwd;
+
+our $VERSION = '0.1';
 
 our @EXPORT_OK = (qw(
     root resource get post scope
@@ -53,7 +56,9 @@ sub new {
         %arg,
     };
     
-    bless $self, $class;
+    $self = bless $self, $class;
+    
+    $self;
 }
 
 =head2 get_required
@@ -201,23 +206,23 @@ sub dispatch {
         my $pack = join('::', @t);
         
         my $full_path;
-        if ( scalar @t > 1 ) {
+        #if ( scalar @t > 1 ) {
             # Vector::Info::index (for Vector::Info)
-            $full_path = $cwd.'/lib/'.join('/', @t).'.pm';
-        } else {
+            $full_path = $cwd.'/lib/Controller/'.join('/', @t).'.pm';
+        #} else {
             # Auth::index (for Controller::Auth)
             $pack = 'Controller::'.$pack;
-            $full_path = $cwd.'/lib/Controller/'.$t[0].'.pm';
-        }
+        #    $full_path = $cwd.'/lib/Controller/'.$t[0].'.pm';
+        #}
         
         println_red('Package [', $pack, $func, '] => file [', $full_path, "] is not exists. See route ", dumper($a)) unless ( -e $full_path );
         
         require $full_path;
-        if ( scalar @t > 1 ) {
-            $a->{template_file}   = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
-        } else {
+        #if ( scalar @t > 1 ) {
+        #    $a->{template_file}   = $cwd.'/template/'.join('/', @t).'/'.$func.'.html';
+        #} else {
             $a->{template_file}   = $cwd.'/template/Controller/'.join('/', @t).'/'.$func.'.html';
-        }
+        #}
         
         my ($gr1, $gr2) = get_required($cwd, $full_path);
         $a->{require_sub} = sub{ $gr1->$gr2(@_) } if($gr1);
@@ -259,11 +264,16 @@ sub dispatch {
         template_engine => $self->{template_engine},
         secret          => $self->{secret},
     );
+    my $model = new WB::Model(
+        env => $self->{env},
+        db  => $db,
+    );
     my $req = new WB::Request(
         env        => $self->{env},
         response   => $response,
         secret     => $self->{secret},
         db         => $db,
+        model      => $model,
         #vboxmanage => $self->{vboxmanage},
     );
     

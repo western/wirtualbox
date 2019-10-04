@@ -29,9 +29,14 @@ sub new{
 
 # virtual methods
 
-sub vboxmanage{
+# sub vboxmanage{
+#     my $self = shift;
+#     $self->{vboxmanage};
+# }
+
+sub model{
     my $self = shift;
-    $self->{vboxmanage};
+    $self->{model};
 }
 
 sub db{

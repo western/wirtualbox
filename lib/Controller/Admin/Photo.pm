@@ -1,5 +1,5 @@
 
-package Admin::Photo;
+package Controller::Admin::Photo;
 
 use utf8;
 use WB::Util qw(:def);

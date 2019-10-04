@@ -1,5 +1,5 @@
 
-package Controller::Application;
+package Controller::App;
 
 use utf8;
 use WB::Util qw(:def);
