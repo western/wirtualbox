@@ -17,8 +17,7 @@ sub index {
     #die dumper $r->model->db;
     #die dumper $r->model->Article->db;
     #die dumper $r->model->Article->list;
-    
-    
+    #die $r->model->Article->list->[0]->{registered}->value;
     
     
 }

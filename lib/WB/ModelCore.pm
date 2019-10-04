@@ -10,6 +10,7 @@ use WB::Type::Text;
 use WB::Type::Datetime;
 
 use DBI;
+use Storable qw(dclone);
 
 # init data 
 #   $WB::ModelCore->{storage}->{Package::Name}->{has_many}
@@ -95,13 +96,21 @@ sub list {
     my $self = shift;
     
     my @fields = map { $_->{name} } @{$self->{fields}};
+    my %fields = map { $_->{name} => $_ } @{$self->{fields}};
+    
+    
     
     my $list2;
     my $list = $self->db->selectall_arrayref( qq~select * from `$self->{table_name}` order by $self->{primary_name} asc~ );
     for my $row (@$list){
         my $row2 = {};
         for( my $i=0; $i<scalar @fields; $i++ ){
-            $row2->{$fields[$i]} = $row->[$i];
+            
+            my $obj = dclone $fields{$fields[$i]};
+            $obj->{value} = $row->[$i];
+            
+            #$row2->{$fields[$i]} = $row->[$i];
+            $row2->{$fields[$i]} = $obj;
         }
         push @$list2, $row2;
     }

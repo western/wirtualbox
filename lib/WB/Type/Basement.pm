@@ -33,6 +33,20 @@ sub new {
     $self;
 }
 
+=head2 value
+    
+    getter and setter
+    
+=cut
+sub value {
+    my $self  = shift;
+    my $value = shift;
+    
+    $self->{value} = $value if ( defined $value );
+    
+    $self->{value};
+}
+
 =head2 get_obj_datetime
     
     get DateTime object
