@@ -14,27 +14,27 @@
 ##### PSGI - Perl Web Server Gateway Interface specification
 ##### Predeclared behaviour - some behaviours dictated from framework
 ## Fast start
-* get repository
-* run "make" command
+* get repository `https://github.com/western/wirtualbox`
+* run `make` command
 * and enjoy
 ## Routing
 System support follow requests on low level:
-* get - ``` get( '/path/to/' => 'Package::Full::Name::and_his_action' ) ```
-* post - ``` post( '/path/to/' => 'Package::Full::Name::and_his_action' ) ```
+* ` get( '/path/to/' => 'Package::Full::Name::and_his_action' ) `
+* ` post( '/path/to/' => 'Package::Full::Name::and_his_action' ) `
 ### Special
-* root - declare action for root "/" request
+* root - declare action for `root "/"` request
 * resource
 * scope - combine some sources with location
 ### Resource
 Resource is a automatic generator for all source methods REST support
 Example, resource 'namething' make:
-* GET /namething/new for ```Namething::new``` sub
-* POST /namething - ```Namething::create```
-* GET /namething/:id/edit - ```Namething::edit```
-* GET /namething/:id/del - ```Namething::del```
-* POST /namething/:id - ```Namething::update```
-* GET /namething/:id - ```Namething::show```
-* GET /namething/ - ```Namething::index```
+* GET `/namething/new` for `Namething::new` sub
+* POST `/namething` - `Namething::create`
+* GET `/namething/:id/edit` - ```Namething::edit```
+* GET `/namething/:id/del` - ```Namething::del```
+* POST `/namething/:id` - ```Namething::update```
+* GET `/namething/:id` - ```Namething::show```
+* GET `/namething/` - ```Namething::index```
 
 ##### Example 1: simple source file with root and /auth requests
 ```perl
@@ -264,3 +264,32 @@ sub some_change {
     }
 }
 ```
+## Model
+### Model configuration
+```perl
+sub index {
+    my($self, $r, $args) = @_;
+    
+    # get database handle
+    $r->model->db;
+    # or
+    $r->model->Article->db;
+    # select * from articles
+    $r->model->Article->list;
+    # get value registered from first row
+    $r->model->Article->list->[0]->{registered}->value;
+    
+    # $r->model->Article->join( 'users' )->list->[0];
+    # $r->model->Article->join( 'left users' )->list->[0];
+    # $r->model->Article->join( 'left users' => 'articles.user_id = users.xx' )->list->[0];
+    # $r->model->Article->join( 'comments' )->list->[0];
+    # $r->model->Article->join( 'left comments' )->list->[0];
+    
+    # $r->model->Article->join( 'users' )->list()->[0];
+    # $r->model->Article->join( 'users' )->list->[0];
+    # $r->model->Article->join( 'users' )->list( -flat => 1 )->[0];
+    # $r->model->Article->join( 'users' )->list( -data => 1 )->[0];
+    # $r->model->Article->join( 'users' )->list( -data => 1 );
+}
+```
+
