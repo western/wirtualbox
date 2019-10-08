@@ -19,6 +19,17 @@ sub index {
     #die dumper $r->model->Article->list;
     #die $r->model->Article->list->[0]->{registered}->value;
     
+    #$r->model->Article->join( 'users' )->list->[0];
+    #$r->model->Article->join( 'left users' )->list->[0];
+    #$r->model->Article->join( 'left users' => 'articles.user_id = users.xx' )->list->[0];
+    #$r->model->Article->join( 'comments' )->list->[0];
+    #$r->model->Article->join( 'left comments' )->list->[0];
+    
+    #die dumper $r->model->Article->join( 'users' )->list()->[0];
+    #die dumper $r->model->Article->join( 'users' )->list->[0];
+    #die dumper $r->model->Article->join( 'users' )->list( -flat => 1 )->[0];
+    #die dumper $r->model->Article->join( 'users' )->list( -data => 1 )->[0];
+    #die dumper $r->model->Article->join( 'users' )->list( -data => 1 );
     
 }
 
