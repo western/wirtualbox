@@ -15,8 +15,9 @@
 ##### Predeclared behaviour - some behaviours dictated from framework
 ## Fast start
 * get repository `https://github.com/western/wirtualbox`
-* run `make` command
-* and enjoy
+* run `make` command - developer environment start for default 8090 port
+* run `make run` - start daemon for default 8090 port
+* run `make kill` - kill daemon
 ## Routing
 System support follow requests on low level:
 * ` get( '/path/to/' => 'Package::Full::Name::and_his_action' ) `
