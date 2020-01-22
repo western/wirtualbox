@@ -20,14 +20,14 @@ our @EXPORT_OK = (
     qw(url_escape url_unescape),
     qw(dumper required template_layout),
     qw(encode_json decode_json),
-    qw(println_red println_yellow),
+    qw(println_red println_yellow println_white),
 );
 
 our %EXPORT_TAGS = (
     def => [qw(
         dumper required template_layout
         encode_json decode_json
-        println_red println_yellow
+        println_red println_yellow println_white
     )]
 );
 
@@ -37,6 +37,10 @@ sub println_red {
 
 sub println_yellow {
     print color('bold yellow').join(' ', @_).color('reset')."\n";
+}
+
+sub println_white {
+    print color('bold white').join(' ', @_).color('reset')."\n";
 }
 
 sub decode {
