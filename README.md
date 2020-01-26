@@ -273,10 +273,13 @@ package Model::Article;
 
 use base WB::ModelCore;
 
-__PACKAGE__->config(
-    table_name => 'articles',
-    #opt1 => 'xxx',
-);
+__PACKAGE__->config( table_name => 'articles' );
+
+__PACKAGE__->config( define_type => {
+    'articles.body'  => 'Wysiwyg',
+    'articles.title' => 'Edit',
+});
+
 __PACKAGE__->belong_to( user_id => 'users.id' );
 __PACKAGE__->has_many( id => 'comments.article_id' );
 1;
@@ -319,4 +322,37 @@ sub index {
     # $r->model->Article->join( 'users' )->list( -data => 1 )->[0];
     # $r->model->Article->join( 'users' )->list( -data => 1 );
 }
+```
+
+## WB Type
+### WB Type simple
+
+```perl
+package WB::Type::Int;
+
+use base WB::Type::Basement;
+
+1;
+
+```
+
+### WB Type extend
+
+```perl
+
+package WB::Type::Wysiwyg;
+
+use base WB::Type::Text;
+
+sub value {
+    my $self  = shift;
+    my $value = shift;
+    
+    $self->{value} = $value if ( defined $value );
+    
+    '[['.$self->{value}.']]';
+}
+
+1;
+
 ```
