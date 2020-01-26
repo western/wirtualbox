@@ -7,7 +7,7 @@ use utf8;
 use lib 'lib';
 use WB::Router qw(:def);
 use WB::Util qw(dumper);
-use VBoxManage;
+#use VBoxManage;
 
 
 
@@ -51,6 +51,8 @@ my $app = sub {
             
             resource 'user',
             resource 'article',
+            
+            #get('/article2' => 'Admin::Article2::index'),
         ]),
         
         

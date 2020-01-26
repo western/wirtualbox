@@ -104,6 +104,8 @@ sub process{
     my %arg = @_;
     my $to = $self->{template_object};
     my $selfut;
+    my $cwd  = getcwd();
+    $cwd .= '/template';
     
     if( $to && $self->{template_engine} eq 'Template' ){
         
@@ -120,12 +122,22 @@ sub process{
     
     if( $self->{template_engine} eq 'HTML::Template' ){
         
-        $to = HTML::Template->new(filename => $self->{template_file}, die_on_bad_params => 0, utf8 => 1);
+        $to = HTML::Template->new(
+            filename          => $self->{template_file},
+            path              => [$cwd],
+            die_on_bad_params => 0,
+            utf8              => 1
+        );
         $to->param(%arg);
         my $main = $to->output;
         
         if( $self->{template_layout} && $self->{template_layout} ne 'none' ){
-            $to = HTML::Template->new(filename => $self->{template_layout}, die_on_bad_params => 0, utf8 => 1);
+            $to = HTML::Template->new(
+                filename          => $self->{template_layout},
+                path              => [$cwd],
+                die_on_bad_params => 0,
+                utf8              => 1
+            );
             $to->param(%arg);
             $to->param(main => $main);
             $selfut = $to->output;

@@ -32,7 +32,7 @@ sub _prepare_model {
     my @models = grep { /\.pm$/ && -f "$cwd/$_" } readdir($dh);
     closedir $dh;
     
-    #package Model::Article;
+    
     
     for my $m ( @models ) {
         

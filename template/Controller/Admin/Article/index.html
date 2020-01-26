@@ -13,65 +13,75 @@
         </nav>
     </div>
     
-    <div class="row">
-        <form>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-            <label class="form-check-label" for="defaultCheck1">
-                #
-            </label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="defaultCheck2">
-            <label class="form-check-label" for="defaultCheck2">
-                First
-            </label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="defaultCheck3">
-            <label class="form-check-label" for="defaultCheck3">
-                Last
-            </label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="defaultCheck4">
-            <label class="form-check-label" for="defaultCheck4">
-                Handle
-            </label>
-        </div>
-        </form>
-    </div>
+    
+    
+    
+    <ul class="pagination" ></ul>
     
     <div class="row">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">id</th>
+                    <th scope="col">title</th>
+                    <th scope="col">body</th>
+                    <th scope="col">registered</th>
+                    <th scope="col">password</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                </tr>
+                
+                <TMPL_LOOP NAME=list>
+                    <tr>
+                        <th scope="row"><TMPL_VAR NAME=id></th>
+                        <td><a href="/admin/article/<TMPL_VAR NAME=id>/edit"><TMPL_VAR NAME=title></a></td>
+                        <td><TMPL_VAR NAME=body></td>
+                        <td><TMPL_VAR NAME=registered></td>
+                        <td><TMPL_VAR NAME=users.password></td>
+                    </tr>
+                </TMPL_LOOP>
+                
             </tbody>
         </table>
     </div>
+    
+    
+    <p>
+        All count: <TMPL_VAR NAME=list_count>
+    </p>
+    
+    
+    <ul class="pagination" ></ul>
+    
+    
+    <form id="form_filter">
+        <input type="hidden" name="filter_page" id="filter_page" value="<TMPL_VAR NAME=filter_page>">
+        
+    </form>
+    
+    
+    
 </div>
+
+
+
+<script>
+$(document).ready(function(){
+    
+    $('.pagination').twbsPagination({
+		startPage:    <TMPL_VAR NAME=filter_page>,
+		totalPages:   <TMPL_VAR NAME=list_pages>,
+		visiblePages: 15,
+		initiateStartPageClick: false,
+		onPageClick: function (event, page) {
+			$('#filter_page').val(page);
+			$('#form_filter').submit();
+		},
+		first: 'First',
+		prev: '&laquo;',
+		next: '&raquo;',
+		last: 'Last'
+	});
+});
+</script>
+

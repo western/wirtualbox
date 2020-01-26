@@ -13,7 +13,7 @@ use WB::Util qw(:def);
 use Exporter 'import';
 use Cwd;
 
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 
 # Конечно, счастье есть на свете,
 # Монетку ты скорее дай,

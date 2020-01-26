@@ -151,10 +151,11 @@ sub template_args{
 
 sub set404{
     my $self = shift;
+    my $msg  = shift || '404 Not Found';
     $self->{mode} = 'body';
     $self->{code} = 404;
     $self->{body} = [
-        '<h1>404 Not Found</h1><hr>',
+        "<h1>$msg</h1><hr>",
         $self->{env}{PATH_INFO},
     ];
 }
@@ -172,10 +173,11 @@ sub set301{
 
 sub set403{
     my $self = shift;
+    my $msg  = shift || '403 Forbidden';
     $self->{mode} = 'body';
     $self->{code} = 403;
     $self->{body} = [
-        '<h1>403 Forbidden</h1><hr>',
+        "<h1>$msg</h1><hr>",
         $self->{env}{PATH_INFO},
     ];
 }

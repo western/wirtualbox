@@ -1,0 +1,127 @@
+
+<!-- _TMPL_INCLUDE NAME="_admin_common.html"-->
+
+<div class="container">
+    
+    <div class="row">
+        <h1>Article edit</h1>
+    </div>
+    
+    <div class="row">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+                <li class="breadcrumb-item"><a href="/admin/article">Article</a></li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="row">
+        
+        <form class="col-md-12" id="form1" method="post">
+            
+            <script>
+                wb.form_build('<TMPL_VAR name="data">', [
+                    {name: 'id', type: 'hidden'},
+                    {name: 'title', type: 'edit'},
+                    {name: 'status', type: 'enum'},
+                    {name: 'body', type: 'wysiwyg'},
+                    {name: 'region_id', type: 'select'}
+                ], 'form1');
+            </script>
+            
+            
+            
+            <div class="form-group">
+                <label for="someid1">Label of input type</label>
+                <input type="text" class="form-control" id="someid1" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="someid2">Label of input type</label>
+                <textarea class="form-control" id="someid2"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="someid3">Label of input type</label>
+                <select class="form-control" id="someid3">
+                    <option value="ww">ww</option>
+                    <option value="ee">ee</option>
+                    <option value="rr">rr</option>
+                    <option value="tt">tt</option>
+                </select>
+            </div>
+            
+            <!--
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1">
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div>
+            
+            <div class="form-group">
+                <label for="exampleFormControlInput1">Email address</label>
+                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Example select</label>
+                <select class="form-control" id="exampleFormControlSelect1">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlSelect2">Example multiple select</label>
+                <select multiple class="form-control" id="exampleFormControlSelect2">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Example textarea</label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+            -->
+            
+            <div class="form-group float-right">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+        
+    </div>
+    
+    
+    
+    
+    <div class="row">
+        &nbsp;
+    </div>
+    
+    
+</div>
+
+
+
+<script>
+$(document).ready(function(){
+    
+    
+});
+</script>
+
+
+
