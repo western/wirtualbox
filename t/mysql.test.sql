@@ -43,6 +43,7 @@ create table articles(
     title varchar(512) not null default '',
     body text,
     status enum('draft', 'publish') not null default 'draft',
+    for_first_page bool not null default 0,
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;

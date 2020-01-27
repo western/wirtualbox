@@ -13,6 +13,7 @@ use JSON::XS;
 use WB::Util qw(:def);
 
 use WB::Type::Int;
+use WB::Type::Tinyint;
 use WB::Type::Varchar;
 use WB::Type::Enum;
 use WB::Type::Text;
@@ -116,6 +117,7 @@ sub _fields_from_table {
             
         }else{
             $type_class = 'WB::Type::Int'      if ( $a->[1] =~ m!^int! );
+            $type_class = 'WB::Type::Tinyint'  if ( $a->[1] =~ m!^tinyint! );
             $type_class = 'WB::Type::Varchar'  if ( $a->[1] =~ m!^varchar! );
             $type_class = 'WB::Type::Enum'     if ( $a->[1] =~ m!^enum! );
             $type_class = 'WB::Type::Text'     if ( $a->[1] =~ m!^text! );
@@ -299,6 +301,14 @@ sub gain {
     $self;
 }
 
+sub attach {
+    my $self = shift;
+    
+    push @{$self->{attach}}, @_;
+    
+    $self;
+}
+
 =head2 join
     
     join( 'users' )
@@ -370,7 +380,7 @@ sub _reset {
     my $self = shift;
     
     $self->{where} = $self->{where_arg} = undef;
-    $self->{join} = $self->{gain} = [];
+    $self->{join} = $self->{gain} = $self->{attach} = [];
     $self->{limit} = $self->{offset} = $self->{orderby} = undef;
 }
 
@@ -438,7 +448,18 @@ sub list {
             for my $key ( keys %$row ) {
                 
                 $row->{$key} = $row->{$key}->value if ( $row->{$key} && $key !~ /_raw_$/ );
+                
+                if( $arg{-json} ){
+                    $row->{$key} =~ s!'!&apos;!g;
+                    $row->{$key} =~ s!"!&quot;!g;
+                }
             }
+        }
+        
+        if( $arg{-json} ){
+            
+            $list2 = JSON::XS->new->utf8->encode($list2);
+            #$row2 =~ s!'!&apos;!g;
         }
     }
     
@@ -496,6 +517,63 @@ sub first {
         push @$list2, $row2;
     }
     
+    for my $ga ( @{$self->{gain}} ) {
+        
+        # check
+        my $ga_assign = '';
+        my $ga_field = '';
+        for my $f (qw(belong_to has_many)){
+            for my $el ( @{$self->{$f}} ) {
+                my @t = split(/\./, $el->[1]);
+                
+                #warn "1: ga ($ga) t[0] ($t[0])";
+                if( $ga eq $t[0] ){
+                    
+                    #warn "2: ga ($ga) t[0] ($t[0])";
+                    
+                    $ga_assign = "select * from $ga where $el->[1] = ? ";
+                    $ga_field  = $el->[0];
+                    
+                    #warn "3: ga_assign ($ga_assign)";
+                    #warn "3: ga_field ($ga_field)";
+                }
+            }
+        }
+        
+        # set for each row
+        for my $row ( @$list2 ) {
+            
+            $row->{$ga.'_raw_'} = $self->db->selectall_arrayref( $ga_assign, {Slice=>{}}, $row->{$ga_field}->value );
+        }
+    }
+    
+    for my $at ( @{$self->{attach}} ) {
+        
+        # check
+        my $at_assign = '';
+        for my $f (qw(belong_to has_many)){
+            for my $el ( @{$self->{$f}} ) {
+                my @t = split(/\./, $el->[1]);
+                
+                #warn "1: at ($at) t[0] ($t[0])";
+                if( $at eq $t[0] ){
+                    
+                    #warn "2: at ($at) t[0] ($t[0])";
+                    
+                    $at_assign = "select * from $at ";
+                    
+                    #warn "3: at_assign ($at_assign)";
+                }
+            }
+        }
+        
+        # set for each row
+        for my $row ( @$list2 ) {
+            
+            $row->{$at.'_raw_'} = $self->db->selectall_arrayref( $at_assign, {Slice=>{}} );
+        }
+    }
+    
     if ( $arg{-flat} ) {
         
         my @list3;
@@ -505,6 +583,11 @@ sub first {
             my $row2 = {};
             
             for my $key ( keys %$row ) {
+                
+                if ($key =~ /_raw_$/){
+                    $row2->{$key} = $row->{$key};
+                    next;
+                }
                 
                 $row2->{$key}->{ref} = ref $row->{$key};
                 

@@ -8,7 +8,7 @@ use POSIX;
 
 use Model::Article;
 
-required 'App::auth_required';
+#required 'App::auth_required';
 template_layout 'vue';
 #template_layout 'admin';
 
@@ -101,14 +101,18 @@ sub edit {
     #die $data->{body}->value;
     #die dumper $data;
     
-    my $data = $r->model->Article->where(id => $args->{id})->first( -flat=>1, -json=>1 );
+    #my $data = $r->model->Article->where(id => $args->{id})->attach('regions', 'users')->first( -flat=>1, -json=>1 );
+    my $data = $r->model->Article->where(id => $args->{id})->first( -data=>1, -json=>1 );
     #die dumper $data;
     if( !$data ){
         return $r->response->set404('This Article by '.$args->{id}.' is not found');
     }
     
+    my @regions = map { [$_->{id}, $_->{title}] } @{$r->model->Region->list( -data=>1 )};
+    
     $r->response->template_args(
         data => $data,
+        regions => JSON::XS->new->utf8->encode(\@regions),
     );
 }
 
