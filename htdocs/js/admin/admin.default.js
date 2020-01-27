@@ -27,7 +27,7 @@ if( typeof(wb) == "undefined" )
         data = JSON.parse(data);
         whereto_d = $(whereto);
         
-        
+        console.log('data=', data);
         
         for(var i=0; i<control.length; i++){
             

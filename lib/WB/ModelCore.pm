@@ -454,13 +454,13 @@ sub list {
                     $row->{$key} =~ s!"!&quot;!g;
                 }
             }
+            
+            if( $arg{-json} ){
+                $row = JSON::XS->new->utf8->encode($row);
+            }
         }
         
-        if( $arg{-json} ){
-            
-            $list2 = JSON::XS->new->utf8->encode($list2);
-            #$row2 =~ s!'!&apos;!g;
-        }
+        
     }
     
     if ( $arg{-flat} ) {
@@ -473,23 +473,48 @@ sub list {
             
             for my $key ( keys %$row ) {
                 
+                if ($key =~ /_raw_$/){
+                    $row2->{$key} = $row->{$key};
+                    next;
+                }
+                
+                $row2->{$key}->{ref} = ref $row->{$key};
+                
                 for my $f (qw(default extra name name_full not_null primary_key type value)) {
-                    $row2->{$key}->{$f} = $row->{$key}->{$f};
+                    
+                    my $vv = $row->{$key}->{$f};
+                    
+                    if ( $arg{-json} ) {
+                        $vv =~ s!"!&quot;!g;
+                        $row2->{$key}->{$f} = $vv;
+                    }else{
+                        $row2->{$key}->{$f} = $vv;
+                    }
                 }
                 
             }
-            push @list3, $row2;
+            
+            if ( $arg{-json} ) {
+                
+                $row2 = JSON::XS->new->utf8->encode($row2);
+                $row2 =~ s!'!&apos;!g;
+                
+                push @list3, $row2;
+            }else{
+                push @list3, $row2;
+            }
         }
         
         @$list2 = @list3;
     }
+    
     
     $self->_reset;
     
     $list2;
 }
 
-sub first {
+sub first__ {
     my $self = shift;
     my %arg  = @_;
     

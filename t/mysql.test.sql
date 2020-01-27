@@ -68,7 +68,7 @@ insert into articles(user_id, title, body, registered) values(5, 'title16', 'bod
 insert into articles(user_id, title, body, registered) values(5, 'title17', 'body17', now());
 insert into articles(user_id, title, body, registered) values(5, 'title18', 'body18', now());
 insert into articles(user_id, title, body, registered) values(5, 'title19', 'body19', now());
-
+update articles set region_id=3 where id=5;
 
 drop table if exists comments;
 
