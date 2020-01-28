@@ -3,9 +3,9 @@
 /* grant all privileges on test.* to test@127.0.0.1 identified by 'test'; */
 
 
-drop table if exists users;
+drop table if exists user;
 
-create table users(
+create table user(
     id int unsigned not null primary key auto_increment,
     login varchar(50) not null default '',
     password varchar(50) not null default '',
@@ -14,29 +14,55 @@ create table users(
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
-insert into users(login, password, name, registered) values('login1', 'password1', 'name1', now());
-insert into users(login, password, name, registered) values('login2', 'password2', 'name2', now());
-insert into users(login, password, name, registered) values('login3', 'password3', 'name3', now());
+insert into user(login, password, name, registered) values('login1', 'password1', 'name1', now());
+insert into user(login, password, name, registered) values('login2', 'password2', 'name2', now());
 
 
-drop table if exists regions;
+drop table if exists perm;
 
-create table regions(
+create table perm(
+    id int unsigned not null primary key auto_increment,
+    name varchar(50) not null default '',
+    unique key name(name)
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+insert into perm(name) values('article_new'), ('article_edit'), ('article_view');
+insert into perm(name) values('region_new'), ('region_edit'), ('region_view');
+insert into perm(name) values('comment_new'), ('comment_edit'), ('comment_view'), ('comment_moder');
+
+
+
+drop table if exists user_perm;
+
+create table user_perm(
+    id int unsigned not null primary key auto_increment,
+    user_id int unsigned not null,
+    perm_id int unsigned not null,
+    unique key user_perm(user_id, perm_id)
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+insert into user_perm(user_id, perm_id) select 1, id from perm;
+insert into user_perm(user_id, perm_id) select 2, id from perm;
+
+
+drop table if exists region;
+
+create table region(
     id int unsigned not null primary key auto_increment,
     title varchar(512) not null default ''
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
-truncate regions;
-insert into regions(title) values('region1');
-insert into regions(title) values('region2');
-insert into regions(title) values('region3');
-insert into regions(title) values('region4');
-insert into regions(title) values('region5');
+truncate region;
+insert into region(title) values('region1');
+insert into region(title) values('region2');
+insert into region(title) values('region3');
+insert into region(title) values('region4');
+insert into region(title) values('region5');
 
 
-drop table if exists articles;
+drop table if exists article;
 
-create table articles(
+create table article(
     id int unsigned not null primary key auto_increment,
     user_id int unsigned not null default 0,
     region_id int unsigned not null default 0,
@@ -48,31 +74,31 @@ create table articles(
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
-truncate articles;
-insert into articles(user_id, title, body, registered) values(1, 'title1', 'body1', now());
-insert into articles(user_id, title, body, registered) values(1, 'title2', 'body2', now());
-insert into articles(user_id, title, body, registered) values(2, 'title3', 'body3', now());
-insert into articles(user_id, title, body, registered) values(2, 'title4', 'body4', now());
-insert into articles(user_id, title, body, registered) values(2, 'title5', '{"n":"name1","v":"va\'l\'ue2"}', now());
-insert into articles(user_id, title, body, registered) values(5, 'title6', 'body6', now());
-insert into articles(user_id, title, body, registered) values(5, 'title7', 'body7', now());
-insert into articles(user_id, title, body, registered) values(5, 'title8', 'body8', now());
-insert into articles(user_id, title, body, registered) values(5, 'title9', 'body9', now());
-insert into articles(user_id, title, body, registered) values(5, 'title10', 'body10', now());
-insert into articles(user_id, title, body, registered) values(5, 'title11', 'body11', now());
-insert into articles(user_id, title, body, registered) values(5, 'title12', 'body12', now());
-insert into articles(user_id, title, body, registered) values(5, 'title13', 'body13', now());
-insert into articles(user_id, title, body, registered) values(5, 'title14', 'body14', now());
-insert into articles(user_id, title, body, registered) values(5, 'title15', 'body15', now());
-insert into articles(user_id, title, body, registered) values(5, 'title16', 'body16', now());
-insert into articles(user_id, title, body, registered) values(5, 'title17', 'body17', now());
-insert into articles(user_id, title, body, registered) values(5, 'title18', 'body18', now());
-insert into articles(user_id, title, body, registered) values(5, 'title19', 'body19', now());
-update articles set region_id=3 where id=5;
+truncate article;
+insert into article(user_id, title, body, registered) values(1, 'title1', 'body1', now());
+insert into article(user_id, title, body, registered) values(1, 'title2', 'body2', now());
+insert into article(user_id, title, body, registered) values(2, 'title3', 'body3', now());
+insert into article(user_id, title, body, registered) values(2, 'title4', 'body4', now());
+insert into article(user_id, title, body, registered) values(2, 'title5', '{"n":"name1","v":"va\'l\'ue2"}', now());
+insert into article(user_id, title, body, registered) values(5, 'title6', 'body6', now());
+insert into article(user_id, title, body, registered) values(5, 'title7', 'body7', now());
+insert into article(user_id, title, body, registered) values(5, 'title8', 'body8', now());
+insert into article(user_id, title, body, registered) values(5, 'title9', 'body9', now());
+insert into article(user_id, title, body, registered) values(5, 'title10', 'body10', now());
+insert into article(user_id, title, body, registered) values(5, 'title11', 'body11', now());
+insert into article(user_id, title, body, registered) values(5, 'title12', 'body12', now());
+insert into article(user_id, title, body, registered) values(5, 'title13', 'body13', now());
+insert into article(user_id, title, body, registered) values(5, 'title14', 'body14', now());
+insert into article(user_id, title, body, registered) values(5, 'title15', 'body15', now());
+insert into article(user_id, title, body, registered) values(5, 'title16', 'body16', now());
+insert into article(user_id, title, body, registered) values(5, 'title17', 'body17', now());
+insert into article(user_id, title, body, registered) values(5, 'title18', 'body18', now());
+insert into article(user_id, title, body, registered) values(5, 'title19', 'body19', now());
+update article set region_id=3 where id=5;
 
-drop table if exists comments;
+drop table if exists comment;
 
-create table comments(
+create table comment(
     id int unsigned not null primary key auto_increment,
     article_id int unsigned not null default 0 comment 'link to article.id',
     user_id int unsigned not null default 0 comment 'link to user.id',
@@ -81,11 +107,11 @@ create table comments(
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
-truncate comments;
-insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment1', now());
-insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment2', now());
-insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment3', now());
-insert into comments(article_id, user_id, body, registered) values(1, 1, 'comment4', now());
-insert into comments(article_id, user_id, body, registered) values(2, 1, 'comment5', now());
-insert into comments(article_id, user_id, body, registered) values(2, 1, 'comment6', now());
+truncate comment;
+insert into comment(article_id, user_id, body, registered) values(1, 1, 'comment1', now());
+insert into comment(article_id, user_id, body, registered) values(1, 1, 'comment2', now());
+insert into comment(article_id, user_id, body, registered) values(1, 1, 'comment3', now());
+insert into comment(article_id, user_id, body, registered) values(1, 1, 'comment4', now());
+insert into comment(article_id, user_id, body, registered) values(2, 1, 'comment5', now());
+insert into comment(article_id, user_id, body, registered) values(2, 1, 'comment6', now());
 

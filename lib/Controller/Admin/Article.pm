@@ -62,9 +62,9 @@ sub index {
     my $list_limit = 15.0;
     my $list_offset = ($filter_page-1) * $list_limit;
     
-    my $list = $r->model->Article->join('left users')->join('left regions')->gain('comments')->limit($list_limit)->offset($list_offset)->list( -data=>1 );
-    #my $list = $r->model->Article->join('left users')->gain('comments')->list();
-    my $list_count = $r->model->Article->join('left users')->count;
+    my $list = $r->model->Article->join('left user')->join('left region')->gain('comment')->limit($list_limit)->offset($list_offset)->list( -data=>1 );
+    #my $list = $r->model->Article->join('left user')->gain('comment')->list();
+    my $list_count = $r->model->Article->join('left user')->count;
     
     
     #die dumper $list->[0];
@@ -106,13 +106,21 @@ sub edit {
     #die JSON::XS->new->utf8->encode($data);
     #die dumper $data;
     if( !$data ){
-        return $r->response->set404('This Article by '.$args->{id}.' is not found');
+        $r->response->mode('template');
+        $r->response->code('404');
+        $r->response->template_args(
+            msg        => 'This Article by '.$args->{id}.' is not found',
+            is_article => 1,
+        );
+        return $r->response->template_file('404');
+        #return $r->response->set404('This Article by '.$args->{id}.' is not found');
     }
+    
     
     my @regions = map { [$_->{id}, $_->{title}] } @{$r->model->Region->list( -data=>1 )};
     
     $r->response->template_args(
-        data => $data,
+        data    => $data,
         regions => JSON::XS->new->utf8->encode(\@regions),
     );
 }

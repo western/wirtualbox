@@ -301,13 +301,6 @@ sub gain {
     $self;
 }
 
-sub attach {
-    my $self = shift;
-    
-    push @{$self->{attach}}, @_;
-    
-    $self;
-}
 
 =head2 join
     
@@ -380,7 +373,7 @@ sub _reset {
     my $self = shift;
     
     $self->{where} = $self->{where_arg} = undef;
-    $self->{join} = $self->{gain} = $self->{attach} = [];
+    $self->{join} = $self->{gain} = [];
     $self->{limit} = $self->{offset} = $self->{orderby} = undef;
 }
 
@@ -400,7 +393,10 @@ sub list {
     } @{$self->{fields}};
     
     # @fields has contain:
-    # ["id", "user_id", "title", "body", "registered", "changed", "users.id", "users.login", "users.password", "users.name", "users.registered", "users.changed"]
+    # [
+    #   "id", "user_id", "title", "body", "registered", "changed",
+    #   "users.id", "users.login", "users.password", "users.name", "users.registered", "users.changed"
+    # ]
     
     my $list2;
     
@@ -478,7 +474,7 @@ sub list {
                     next;
                 }
                 
-                $row2->{$key}->{ref} = ref $row->{$key};
+                $row2->{$key}->{class} = ref $row->{$key};
                 
                 for my $f (qw(default extra name name_full not_null primary_key type value)) {
                     
