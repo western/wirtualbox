@@ -1,1 +1,33 @@
- 
+
+<div class="container">
+    
+    <div class="row">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                
+                <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+                
+                <TMPL_IF name="is_article">
+                    <li class="breadcrumb-item"><a href="/admin/article">Article</a></li>
+                </TMPL_IF>
+                
+                <TMPL_IF name="is_news">
+                    <li class="breadcrumb-item"><a href="/admin/news">News</a></li>
+                </TMPL_IF>
+                
+                <TMPL_IF name="is_user">
+                    <li class="breadcrumb-item"><a href="/admin/user">User</a></li>
+                </TMPL_IF>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="row">
+        <h1><img src="/capicon/png/black/057.png"> 404</h1>
+    </div>
+    
+    <div class="row">
+        <h3><TMPL_VAR name="msg"></h3>
+    </div>
+    
+</div>
