@@ -27,7 +27,7 @@ if( typeof(wb) == "undefined" )
         data = JSON.parse(data);
         whereto_d = $(whereto);
         
-        console.log('data=', data);
+        
         
         for(var i=0; i<control.length; i++){
             
@@ -137,6 +137,95 @@ if( typeof(wb) == "undefined" )
         
         
     };
+    
+    
+    
+    wb.make_tr = function(data, control, whereto){
+        
+        data = data.replace(/&apos;/g, "'");
+        data = JSON.parse(data);
+        whereto_d = $(whereto);
+        
+        var tr = $('<tr>');
+        
+        for(var i=0; i<control.length; i++){
+            
+            var c = control[i];
+            var d = data[c.name];
+            var id = whereto_d.attr('id')+'_'+c.name;
+            
+            if( c.type == 'label' ){
+                tr.append($('<td>'+d.value+'</td>'));
+            }else if( c.type == 'edit' ){
+                
+                if( 'edit_link' in c ){
+                    var edit_link = c.edit_link;
+                    for (var name in data){
+                        edit_link = edit_link.replace(':'+name, data[name].value);
+                    }
+                    //console.log('edit_link2=', edit_link);
+                    
+                    tr.append($('<td><a href="'+edit_link+'">'+d.value+'</a></td>'));
+                }else{
+                    
+                    tr.append($('<td>'+d.value+'</td>'));
+                }
+                
+            }else if( c.type == 'submit' ){
+                tr.append($('<td>submit</td>'));
+            }else if( c.type == 'checkbox' ){
+                
+                var value = d.value;
+                
+                if( 'value_chk' in c ){
+                    if( c.value_chk == d.value ){
+                        value = 'yes';
+                    }else{
+                        value = 'no';
+                    }
+                }
+                
+                tr.append($('<td>'+value+'</td>'));
+                
+            }else if( c.type == 'enum' ){
+                
+                var value = d.value;
+                
+                if( 'option' in c ){
+                    for(var a=0; a<c.option.length; a++){
+                        var opt = c.option[a];
+                        if( opt[0] == d.value ){
+                            value = opt[1];
+                        }
+                    }
+                }
+                
+                tr.append($('<td>'+value+'</td>'));
+                
+            }else if( c.type == 'text' ){
+                tr.append($('<td>'+d.value+'</td>'));
+            }else if( c.type == 'wysiwyg' ){
+                tr.append($('<td>'+d.value+'</td>'));
+            }else if( c.type == 'select' ){
+                
+                var value = d.value;
+                
+                if( 'option' in c ){
+                    for(var a=0; a<c.option.length; a++){
+                        var opt = c.option[a];
+                        if( opt[0] == d.value ){
+                            value = opt[1];
+                        }
+                    }
+                }
+                
+                tr.append($('<td>'+value+'</td>'));
+            }
+        }
+        
+        whereto_d.append(tr);
+    };
+    
     
 })();
 

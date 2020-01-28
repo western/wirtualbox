@@ -23,22 +23,32 @@
             <thead>
                 <tr>
                     <th scope="col">id</th>
-                    <th scope="col">title</th>
-                    <th scope="col">body</th>
-                    <th scope="col">registered</th>
-                    <th scope="col">password</th>
+                    <th scope="col">Заголовок</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Статья</th>
+                    <th scope="col">Показывать на главной странице</th>
+                    <th scope="col">Регион</th>
+                    <th scope="col">submit</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tbody1">
+                
+                <script>
+                    var region_list = <TMPL_VAR region_list>;
+                </script>
                 
                 <TMPL_LOOP NAME=list>
-                    <tr>
-                        <th scope="row"><TMPL_VAR NAME=id></th>
-                        <td><a href="/admin/article/<TMPL_VAR NAME=id>/edit"><TMPL_VAR NAME=title></a></td>
-                        <td><TMPL_VAR NAME=body></td>
-                        <td><TMPL_VAR NAME=registered></td>
-                        <td><TMPL_VAR NAME=users.password></td>
-                    </tr>
+                    <script>
+                        wb.make_tr('<TMPL_VAR name="row">', [
+                            {name: 'id', type: 'label'},
+                            {name: 'title', type: 'edit', label: 'Заголовок', edit_link: '/admin/article/:id/edit'},
+                            {name: 'status', type: 'enum', label: 'Статус', option: [['draft', 'Draft'], ['publish', 'Publish']]},
+                            {name: 'body', type: 'wysiwyg', label: 'Статья'},
+                            {name: 'for_first_page', type: 'checkbox', value_chk: 1, label: 'Показывать на главной странице'},
+                            {name: 'region_id', type: 'select', label: 'Регион', option: region_list},
+                            {name: 'submit', type: 'submit', label: 'Сохранить'}
+                        ], '#tbody1');
+                    </script>
                 </TMPL_LOOP>
                 
             </tbody>

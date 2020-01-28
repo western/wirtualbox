@@ -62,8 +62,7 @@ sub index {
     my $list_limit = 15.0;
     my $list_offset = ($filter_page-1) * $list_limit;
     
-    my $list = $r->model->Article->join('left user')->join('left region')->gain('comment')->limit($list_limit)->offset($list_offset)->list( -data=>1 );
-    #my $list = $r->model->Article->join('left user')->gain('comment')->list();
+    my $list = $r->model->Article->join('left user')->join('left region')->limit($list_limit)->offset($list_offset)->list( -flat=>1, -json=>1, -row_as_obj=>'row' );
     my $list_count = $r->model->Article->join('left user')->count;
     
     
@@ -74,19 +73,18 @@ sub index {
     $list_pages = ceil $list_pages;
     $list_pages = 1 if $list_pages == 0;
     
+    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
+    
     $r->response->template_args(
-        list => $list,
+        
+        list        => $list,
         
         list_count  => $list_count,
         list_pages  => $list_pages,
         filter_page => $filter_page,
+        
+        region_list => JSON::XS->new->utf8->encode($region_list),
     );
-    
-    #die dumper $r->model->Article->join( 'users' )->list->[0];
-    #die dumper $r->model->Article->join( 'users' )->list( -flat => 1 )->[0];
-    #die dumper $r->model->Article->join( 'users' )->list( -data => 1 )->[0];
-    #die dumper $r->model->Article->join( 'users' )->list( -data => 1 );
-    
 }
 
 sub edit {
@@ -103,25 +101,22 @@ sub edit {
     
     #my $data = $r->model->Article->where(id => $args->{id})->attach('regions', 'users')->first( -flat=>1, -json=>1 );
     my $data = $r->model->Article->where(id => $args->{id})->list( -flat=>1, -json=>1 )->[0];
-    #die JSON::XS->new->utf8->encode($data);
-    #die dumper $data;
+    
     if( !$data ){
-        $r->response->mode('template');
-        $r->response->code('404');
-        $r->response->template_args(
+        return $r->response->template404(
+            file => '404',
             msg        => 'This Article by '.$args->{id}.' is not found',
             is_article => 1,
         );
-        return $r->response->template_file('404');
-        #return $r->response->set404('This Article by '.$args->{id}.' is not found');
     }
     
     
-    my @regions = map { [$_->{id}, $_->{title}] } @{$r->model->Region->list( -data=>1 )};
+    
+    my $regions = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
     
     $r->response->template_args(
         data    => $data,
-        regions => JSON::XS->new->utf8->encode(\@regions),
+        regions => JSON::XS->new->utf8->encode($regions),
     );
 }
 

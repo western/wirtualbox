@@ -381,7 +381,7 @@ sub list {
     my $self = shift;
     my %arg  = @_;
     
-    #warn '$self->{fields} '.dumper($self->{fields});
+    
     
     
     my @fields = map {
@@ -414,7 +414,8 @@ sub list {
         push @$list2, $row2;
     }
     
-    
+    # DEPRECATED?
+    # list( -gain=>1 )
     for my $ga ( @{$self->{gain}} ) {
         
         # check
@@ -439,6 +440,9 @@ sub list {
         }
     }
     
+    # list( -data=>1 )
+    # list( -data=>1, -json=>1 )
+    # list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } )
     if ( $arg{-data} ) {
         for my $row ( @$list2 ) {
             for my $key ( keys %$row ) {
@@ -456,9 +460,21 @@ sub list {
             }
         }
         
-        
+        if ( my $m = $arg{-map} ) {
+            
+            my @list3;
+            
+            for my $row ( @$list2 ) {
+                push @list3, $m->( $row );
+            }
+            
+            @$list2 = @list3;
+        }
     }
     
+    # list( -flat=>1 )
+    # list( -flat=>1, -json=>1, -row-as-obj=>'row' )
+    # list( -flat=>1, -json=>1 )
     if ( $arg{-flat} ) {
         
         my @list3;
@@ -481,7 +497,7 @@ sub list {
                     my $vv = $row->{$key}->{$f};
                     
                     if ( $arg{-json} ) {
-                        $vv =~ s!"!&quot;!g;
+                        $vv =~ s!"!&quot;!g if ($vv);
                         $row2->{$key}->{$f} = $vv;
                     }else{
                         $row2->{$key}->{$f} = $vv;
@@ -495,8 +511,13 @@ sub list {
                 $row2 = JSON::XS->new->utf8->encode($row2);
                 $row2 =~ s!'!&apos;!g;
                 
-                push @list3, $row2;
+                if ( $arg{'-row_as_obj'} ) {
+                    push @list3, { $arg{'-row_as_obj'} => $row2 };
+                }else{
+                    push @list3, $row2;
+                }
             }else{
+                
                 push @list3, $row2;
             }
         }
@@ -505,12 +526,11 @@ sub list {
     }
     
     
+    
     $self->_reset;
     
     $list2;
 }
-
-
 
 sub count {
     my $self = shift;
@@ -525,7 +545,7 @@ sub count {
 
 
 
-
+# ------------------------------------------------------------------------------
 
 sub config {
     my $package = shift;

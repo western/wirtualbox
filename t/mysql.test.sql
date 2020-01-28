@@ -26,10 +26,12 @@ create table perm(
     unique key name(name)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
+truncate table perm;
+insert into perm(name) values('user_new'), ('user_edit'), ('user_view');
 insert into perm(name) values('article_new'), ('article_edit'), ('article_view');
 insert into perm(name) values('region_new'), ('region_edit'), ('region_view');
 insert into perm(name) values('comment_new'), ('comment_edit'), ('comment_view'), ('comment_moder');
-
+insert into perm(name) values('doc_new'), ('doc_edit'), ('doc_view'), ('doc_moder');
 
 
 drop table if exists user_perm;
@@ -38,11 +40,13 @@ create table user_perm(
     id int unsigned not null primary key auto_increment,
     user_id int unsigned not null,
     perm_id int unsigned not null,
+    registered datetime not null,
     unique key user_perm(user_id, perm_id)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
-insert into user_perm(user_id, perm_id) select 1, id from perm;
-insert into user_perm(user_id, perm_id) select 2, id from perm;
+truncate user_perm;
+insert into user_perm(user_id, perm_id, registered) select 1, id, now() from perm;
+insert into user_perm(user_id, perm_id, registered) select 2, id, now() from perm;
 
 
 drop table if exists region;
@@ -114,4 +118,21 @@ insert into comment(article_id, user_id, body, registered) values(1, 1, 'comment
 insert into comment(article_id, user_id, body, registered) values(1, 1, 'comment4', now());
 insert into comment(article_id, user_id, body, registered) values(2, 1, 'comment5', now());
 insert into comment(article_id, user_id, body, registered) values(2, 1, 'comment6', now());
+
+
+
+
+drop table if exists doc;
+
+create table doc(
+    id int unsigned not null primary key auto_increment,
+    user_id int unsigned not null default 0,
+    title varchar(1024) not null default '',
+    body text,
+    status enum('draft', 'publish') not null default 'draft',
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+
 
