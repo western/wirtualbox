@@ -149,6 +149,33 @@ sub template_args{
     $self->{template_args};
 }
 
+=head2 template404
+    
+    return $r->response->template404(
+        file => '404',
+        
+        msg        => 'This Article by '.$args->{id}.' is not found',
+        is_article => 1,
+    );
+    
+=cut
+sub template404{
+    my $self = shift;
+    my %args = @_;
+    
+    $self->mode('template');
+    $self->code('404');
+    $self->template_args(
+        %args,
+    );
+    $self->template_file($args{file});
+}
+
+=head2 set404
+    
+    return $r->response->set404('This Article by '.$args->{id}.' is not found');
+    
+=cut
 sub set404{
     my $self = shift;
     my $msg  = shift || '404 Not Found';
