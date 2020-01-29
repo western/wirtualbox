@@ -34,7 +34,7 @@ sub index {
     $list_pages = ceil $list_pages;
     $list_pages = 1 if $list_pages == 0;
     
-    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
+    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 );
     
     $r->response->template_args(
         
@@ -44,7 +44,7 @@ sub index {
         list_pages  => $list_pages,
         filter_page => $filter_page,
         
-        region_list => JSON::XS->new->utf8->encode($region_list),
+        region_list => $region_list,
     );
 }
 
@@ -63,11 +63,11 @@ sub edit {
     }
     
     
-    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
+    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 );
     
     $r->response->template_args(
         data        => $data,
-        region_list => JSON::XS->new->utf8->encode($region_list),
+        region_list => $region_list,
         h1_title    => 'Article edit',
     );
 }
@@ -77,11 +77,11 @@ sub new {
     
     $r->response->template_file('edit');
     
-    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
+    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 );
     
     $r->response->template_args(
         
-        region_list => JSON::XS->new->utf8->encode($region_list),
+        region_list => $region_list,
         h1_title    => 'Article new',
     );
 }

@@ -228,14 +228,9 @@ sub select {
 =cut
 sub where {
     my $self = shift;
-    #my %arg = @_;
     my $arg_cnt = scalar(@_);
     
-    #my %fields = map {
-    #    $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name} => $_
-    #} @{$self->{fields}};
     
-    #die dumper(\@_);
     
     if( $arg_cnt > 1 && ($arg_cnt % 2) == 0 && $_[0] !~ /\s/ ){
         
@@ -343,7 +338,7 @@ sub join {
         };
     }
     
-    warn '$self->{join}= '.dumper $self->{join};
+    #warn '$self->{join}= '.dumper $self->{join};
     
     
     $self;
@@ -529,7 +524,11 @@ sub list {
     
     $self->_reset;
     
-    $list2;
+    if ( $arg{-json_all} ) {
+        return JSON::XS->new->utf8->encode($list2);
+    }else{
+        return $list2;
+    }
 }
 
 sub count {
