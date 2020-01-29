@@ -61,6 +61,17 @@ if( typeof(wb) == "undefined" )
                 var inp = $('<button type="submit" class="btn btn-primary" id="'+id+'" name="'+c.name+'" value="1">'+c.label+'</button>');
                 wrap.append(inp);
                 whereto_d.append(wrap);
+            }else if( c.type == 'file' ){
+                var wrap = $('<div class="form-group">');
+                var label = $('<label for="'+id+'">');
+                label.append(document.createTextNode(c.label));
+                var inp = $('<input type="file" _class="form-control" id="'+id+'" name="'+c.name+'" >');
+                wrap.append(label);
+                wrap.append(inp);
+                if( 'note' in c ){
+                    wrap.append($('<small class="form-text text-muted">'+c.note+'</small>'));
+                }
+                whereto_d.append(wrap);
             }else if( c.type == 'checkbox' ){
                 var wrap = $('<div class="form-group form-check">');
                 var label = $('<label class="form-check-label" for="'+id+'">');
@@ -143,14 +154,10 @@ if( typeof(wb) == "undefined" )
             }
         }
         
-        whereto_d.on('submit', function(ev){
+        
+        whereto_d.ajaxForm({
             
-            event.preventDefault();
-            
-            $.post(
-                whereto_d.attr('action'),
-                $(this).serialize()
-            ).done(function( data ){
+            success: function( data ){
                 
                 if( data.code == 'ok' ){
                     
@@ -162,7 +169,7 @@ if( typeof(wb) == "undefined" )
                     
                     setTimeout(function(){
                         location.href = '/admin/article/'+data.id+'/edit';
-                    }, 1200);
+                    }, 1500);
                     
                 }else{
                     
@@ -171,16 +178,14 @@ if( typeof(wb) == "undefined" )
                         color: 'red'
                     });
                 }
-                
-            }).fail(function( ev, str1, str2 ){
+            },
+            error: function( ev, str1, str2 ){
                 
                 new jBox('Notice', {
                     content: str2,
                     color: 'red'
                 });
-            });
-            
-            return false;
+            }
         });
         
         

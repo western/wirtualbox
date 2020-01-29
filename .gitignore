@@ -1,3 +1,6 @@
 htdocs/bootstrap-4.3.1-dist.zip
 htdocs/bootstrap-4.3.1-dist/
 htdocs/fontawesome-free-5.12.0-web/
+htdocs/file/*.jpg
+htdocs/file/*.jpeg
+

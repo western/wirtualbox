@@ -95,6 +95,20 @@ sub create {
         }) if ( !$r->param($n) );
     }
     
+    my $photo_upload = '';
+    if( my $photo = $r->param('photo') ){
+        
+        $photo_upload = '/file/'.$photo->filename;
+        
+        $photo->upload_to(
+            full_path => $r->{env}{root}.'/htdocs/file/'.$photo->filename,
+        );
+    }
+    
+    # remove previous photo
+    if( $photo_upload ){
+        
+    }
     
     my $id = $r->param('id');
     if( $id ){
@@ -102,6 +116,7 @@ sub create {
         my %r = map { $_ => $r->param($_) } @fields;
         $r{for_first_page} = $r->param('for_first_page') || 0;
         $r{changed}        = current_sql_datetime;
+        $r{photo} = $photo_upload;
         
         $r->model->Article->where( id => $id )->update( %r );
         
@@ -111,6 +126,7 @@ sub create {
         $r{for_first_page} = $r->param('for_first_page') || 0;
         $r{user_id}        = 1;
         $r{registered}     = current_sql_datetime;
+        $r{photo} = $photo_upload;
         
         $id = $r->model->Article->insert( %r );
     }

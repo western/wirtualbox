@@ -78,6 +78,7 @@ create table article(
     body text,
     status enum('draft', 'publish') not null default 'draft',
     for_first_page bool not null default 0,
+    photo varchar(512) not null default '',
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -102,6 +103,7 @@ insert into article(user_id, title, body, registered) values(5, 'title16', 'body
 insert into article(user_id, title, body, registered) values(5, 'title17', 'body17', now());
 insert into article(user_id, title, body, registered) values(5, 'title18', 'body18', now());
 insert into article(user_id, title, body, registered) values(5, 'title19', 'body19', now());
+insert into article(user_id, title, body, registered) select user_id, concat(title,id,id), body, now() from article limit 19;
 update article set region_id=3 where id=5;
 
 drop table if exists comment;

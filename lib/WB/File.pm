@@ -3,6 +3,7 @@ package WB::File;
 
 use strict;
 use warnings;
+use WB::Util qw(:def);
 
 
 sub new{
@@ -49,6 +50,25 @@ sub tempname{
     $self->{tempname};
 }
 
+=head2 upload_to
+    
+    if( my $photo = $r->param('photo') ){
+        
+        $photo->upload_to(
+            full_path => $r->{env}{root}.'/htdocs/img/'.$photo->filename,
+        );
+    }
+    
+    or
+    
+    if( my $photo = $r->param('photo') ){
+        
+        $photo->upload_to(
+            path => $r->{env}{root}.'/htdocs/img/',
+        );
+    }
+    
+=cut
 sub upload_to{
     my $self = shift;
     my %arg = @_;
@@ -68,8 +88,8 @@ sub upload_to{
             unlink $save_full_name or warn "Could not unlink $save_full_name: $!";
         }
         
-        open my $in, '<', $self->{tempname} or die $!;
-        open my $selfut, '>', $save_full_name or die $!;
+        open my $in, '<', $self->{tempname} or die "$! ($self->{tempname})";
+        open my $selfut, '>', $save_full_name or die "$! ($save_full_name)";
         
         binmode $in;
         binmode $selfut;
