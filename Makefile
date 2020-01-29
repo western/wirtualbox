@@ -34,5 +34,9 @@ getcapicon:
 	cd htdocs ; \
 	rm -rf capicon ; \
 	wget -O capicon.zip https://mariodelvalle.github.io/CaptainIcon/capicon.zip && unzip capicon.zip && rm capicon.zip && rm -rf __MACOSX
+getfontawesome:
+	cd htdocs ; \
+	rm -rf fontawesome-free-5.12.0-web ; \
+	wget https://use.fontawesome.com/releases/v5.12.0/fontawesome-free-5.12.0-web.zip && unzip fontawesome-free-5.12.0-web.zip && rm fontawesome-free-5.12.0-web.zip
 test:
 	prove

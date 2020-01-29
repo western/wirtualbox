@@ -9,8 +9,8 @@ use POSIX;
 use Model::Article;
 
 #required 'App::auth_required';
-template_layout 'vue';
-#template_layout 'admin';
+template_layout 'admin';
+
 
 sub index {
     my($self, $r, $args) = @_;
