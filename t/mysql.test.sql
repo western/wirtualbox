@@ -106,6 +106,23 @@ insert into article(user_id, title, body, registered) values(5, 'title19', 'body
 insert into article(user_id, title, body, registered) select user_id, concat(title,id,id), body, now() from article limit 19;
 update article set region_id=3 where id=5;
 
+
+drop table if exists article_region;
+
+create table article_region(
+    id int unsigned not null primary key auto_increment,
+    article_id int unsigned not null,
+    region_id int unsigned not null,
+    registered datetime not null,
+    unique key article_region(article_id, region_id)
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+truncate article_region;
+insert into article_region(article_id, region_id, registered) select 1, id, now() from region;
+
+
+
+
 drop table if exists comment;
 
 create table comment(

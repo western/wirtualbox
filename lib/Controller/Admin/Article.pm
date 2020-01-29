@@ -116,7 +116,7 @@ sub create {
         my %r = map { $_ => $r->param($_) } @fields;
         $r{for_first_page} = $r->param('for_first_page') || 0;
         $r{changed}        = current_sql_datetime;
-        $r{photo} = $photo_upload;
+        $r{photo}          = $photo_upload if ($photo_upload);
         
         $r->model->Article->where( id => $id )->update( %r );
         
@@ -126,7 +126,7 @@ sub create {
         $r{for_first_page} = $r->param('for_first_page') || 0;
         $r{user_id}        = 1;
         $r{registered}     = current_sql_datetime;
-        $r{photo} = $photo_upload;
+        $r{photo}          = $photo_upload if ($photo_upload);
         
         $id = $r->model->Article->insert( %r );
     }

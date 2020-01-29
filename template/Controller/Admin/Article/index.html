@@ -39,6 +39,8 @@
                     <th scope="col">Статья</th>
                     <th scope="col">Показывать на главной странице</th>
                     <th scope="col">Регион</th>
+                    <th scope="col">Создана</th>
+                    <th scope="col">Редактирована</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -57,6 +59,8 @@
                             {name: 'body', type: 'wysiwyg', label: 'Статья'},
                             {name: 'for_first_page', type: 'checkbox', value_chk: 1, label: 'Показывать на главной странице'},
                             {name: 'region_id', type: 'select', label: 'Регион', option: region_list},
+                            {name: 'registered', type: 'label'},
+                            {name: 'changed', type: 'label'},
                             {name: 'submit', type: 'submit', label: 'Сохранить', del_link: '/admin/article/:id/del', del_msg: 'Действительно удалить статью :title?'}
                         ], '#tbody1');
                     </script>
