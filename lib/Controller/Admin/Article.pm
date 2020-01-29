@@ -34,7 +34,7 @@ sub index {
     $list_pages = ceil $list_pages;
     $list_pages = 1 if $list_pages == 0;
     
-    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 );
+    
     
     $r->response->template_args(
         
@@ -44,7 +44,7 @@ sub index {
         list_pages  => $list_pages,
         filter_page => $filter_page,
         
-        region_list => $region_list,
+        region_list => $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 ),
     );
 }
 
@@ -63,11 +63,11 @@ sub edit {
     }
     
     
-    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 );
+    
     
     $r->response->template_args(
         data        => $data,
-        region_list => $region_list,
+        region_list => $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 ),
         h1_title    => 'Article edit',
     );
 }
@@ -77,19 +77,48 @@ sub new {
     
     $r->response->template_file('edit');
     
-    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 );
-    
     $r->response->template_args(
-        
-        region_list => $region_list,
+        region_list => $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 ),
         h1_title    => 'Article new',
     );
 }
 
 sub create {
     my($self, $r, $args) = @_;
+    my @fields = qw(title status body region_id);
+    
+    for my $n (@fields){
+        
+        return $r->response->json({
+            code => 'err',
+            err  => "Essential field $n is empty",
+        }) if ( !$r->param($n) );
+    }
     
     
+    my $id = $r->param('id');
+    if( $id ){
+        
+        my %r = map { $_ => $r->param($_) } @fields;
+        $r{for_first_page} = $r->param('for_first_page') || 0;
+        $r{changed}        = current_sql_datetime;
+        
+        $r->model->Article->where( id => $id )->update( %r );
+        
+    }else{
+        
+        my %r = map { $_ => $r->param($_) } @fields;
+        $r{for_first_page} = $r->param('for_first_page') || 0;
+        $r{user_id}        = 1;
+        $r{registered}     = current_sql_datetime;
+        
+        $id = $r->model->Article->insert( %r );
+    }
+    
+    $r->response->json({
+        code => 'ok',
+        id   => $id,
+    });
 }
 
 1;

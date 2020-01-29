@@ -47,7 +47,7 @@ sub _prepare_model {
     
     for my $m ( @models ) {
         
-        warn $cwd.'/'.$m;
+        #warn $cwd.'/'.$m;
         require $cwd.'/'.$m;
         
         my @pack = split(m!/!, $m);

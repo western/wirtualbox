@@ -18,14 +18,14 @@ my (%ENCODING, %PATTERN);
 our @EXPORT_OK = (
     qw(decode encode),
     qw(url_escape url_unescape),
-    qw(dumper required template_layout),
+    qw(dumper current_sql_datetime required template_layout),
     qw(encode_json decode_json),
     qw(println_red println_yellow println_white),
 );
 
 our %EXPORT_TAGS = (
     def => [qw(
-        dumper required template_layout
+        dumper current_sql_datetime required template_layout
         encode_json decode_json
         println_red println_yellow println_white
     )]
@@ -83,6 +83,15 @@ sub url_unescape {
 
 sub dumper{
     Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
+}
+
+sub current_sql_datetime{
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    
+    $mon ++;
+    $year += 1900;
+    
+    "$year-$mon-$mday $hour:$min:$sec";
 }
 
 sub required{ }

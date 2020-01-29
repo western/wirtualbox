@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Encode qw(decode encode);
 use DBI;
 use Storable qw(dclone);
 use Cwd;
@@ -402,7 +403,7 @@ sub list {
         for ( my $i=0; $i<scalar @fields; $i++ ) {
             
             my $obj = dclone $fields{$fields[$i]};
-            $obj->{value} = $row->[$i];
+            $obj->{value} = decode('UTF-8', $row->[$i]);
             
             $row2->{$fields[$i]} = $obj;
         }
@@ -451,7 +452,7 @@ sub list {
             }
             
             if( $arg{-json} ){
-                $row = JSON::XS->new->utf8->encode($row);
+                $row = JSON::XS->new->utf8(0)->encode($row);
             }
         }
         
@@ -503,7 +504,7 @@ sub list {
             
             if ( $arg{-json} ) {
                 
-                $row2 = JSON::XS->new->utf8->encode($row2);
+                $row2 = JSON::XS->new->utf8(0)->encode($row2);
                 $row2 =~ s!'!&apos;!g;
                 
                 if ( $arg{'-row_as_obj'} ) {
@@ -525,7 +526,7 @@ sub list {
     $self->_reset;
     
     if ( $arg{-json_all} ) {
-        return JSON::XS->new->utf8->encode($list2);
+        return JSON::XS->new->utf8(0)->encode($list2);
     }else{
         return $list2;
     }
@@ -541,6 +542,47 @@ sub count {
     $data->{cnt};
 }
 
+sub insert {
+    my $self = shift;
+    my %arg  = @_;
+    
+    my @names = keys %arg;
+    my $names = join(',', @names);
+    my @values = map { '?' } @names;
+    my $values = join(',', @values);
+    
+    @values = values %arg;
+    
+    $self->db->do("insert into $self->{table_name} ($names) values ($values) ", undef, @values) or die $self->db->errstr;
+    
+    if ( $self->{driver} eq 'mysql' ) {
+        return $self->db->{mysql_insertid};
+    }
+}
+
+sub update {
+    my $self = shift;
+    my %arg  = @_;
+    
+    my @names = keys %arg;
+    my $names = join('=?,', @names); $names .= '=?';
+    my @values = map { '?' } @names;
+    my $values = join(',', @values);
+    
+    @values = values %arg;
+    push @values, @{$self->{where_arg}};
+    
+    my $sql = '';
+    if ( $self->{where} ) {
+        $sql .= 'where '.join(' and ', @{$self->{where}});
+        $sql .= "\n";
+    }
+    
+    warn "update $self->{table_name} set $names $sql ";
+    warn dumper(\@values);
+    
+    $self->db->do("update $self->{table_name} set $names $sql ", undef, @values) or die $self->db->errstr;
+}
 
 
 

@@ -69,24 +69,23 @@ sub template_file{
             # if layout
             if ( !$result_path && -e $cwd.'/'.$self->{$n}.'.html' ) {
                 $result_path = $cwd.'/'.$self->{$n}.'.html';
-                warn "$n set $result_path";
+                warn "$n set1 $result_path";
             }
+            
+            #if ( !$result_path && -e $cwd.'/Controller/'.$self->{$n}.'.html' ) {
+            #    $result_path = $cwd.'/'.$self->{$n}.'.html';
+            #    warn "$n set2 $result_path";
+            #}
             
             # if set simple name "template_file"
             my $route = $self->{route};
             if ( !$result_path && $route && $route->{action} ) {
                 
                 my @t = split(/::/, $route->{action});
-                my $func = pop @t;
-                my $pack = join('::', @t);
+                pop @t;
                 
-                #if ( scalar @t > 1 ) {
-                #    $result_path = $cwd.'/'.join('/', @t).'/'.$self->{$n}.'.html';
-                #    warn "$n set $result_path";
-                #} else {
-                    $result_path = $cwd.'/Controller/'.join('/', @t).'/'.$self->{$n}.'.html';
-                    warn "$n set $result_path";
-                #}
+                $result_path = $cwd.'/Controller/'.join('/', @t).'/'.$self->{$n}.'.html';
+                warn "$n set3 $result_path";
             }
             
             if ( $result_path && -e $result_path ) {

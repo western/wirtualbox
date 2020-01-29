@@ -30,10 +30,6 @@ getvuejs:
 	wget -O vue.js https://vuejs.org/js/vue.js ; \
 	rm vue.min.js ; \
 	wget -O vue.min.js https://vuejs.org/js/vue.min.js
-getcapicon:
-	cd htdocs ; \
-	rm -rf capicon ; \
-	wget -O capicon.zip https://mariodelvalle.github.io/CaptainIcon/capicon.zip && unzip capicon.zip && rm capicon.zip && rm -rf __MACOSX
 getfontawesome:
 	cd htdocs ; \
 	rm -rf fontawesome-free-5.12.0-web ; \
