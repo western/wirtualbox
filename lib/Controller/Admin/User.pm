@@ -8,7 +8,7 @@ use MIME::Base64;
 required 'App::auth_required';
 template_layout 'admin2';
 
-sub index {
+sub index_ {
     my($self, $r, $args) = @_;
     
 #     $r->response->template_file(
@@ -26,7 +26,7 @@ sub index {
 #     });
 }
 
-sub create {
+sub create_ {
     my($self, $r, $args) = @_;
     
     #warn dumper($args->{title});

@@ -39,15 +39,15 @@ my $app = sub {
         
         scope('/admin' => [
             
-            get('/vm/:uuid' => 'Admin::Vm::show'),
-            get('/vm/new' => 'Admin::Vm::new'),
+            #get('/vm/:uuid' => 'Admin::Vm::show'),
+            #get('/vm/new' => 'Admin::Vm::new'),
             
-            resource 'photo',
+            #resource 'photo',
             
-            scope('/admin/inside' => [
+            #scope('/admin/inside' => [
                 
-                resource 'doc',
-            ]),
+            #    resource 'doc',
+            #]),
             
             resource 'user',
             resource 'article',
