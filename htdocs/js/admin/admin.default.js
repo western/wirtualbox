@@ -212,7 +212,6 @@ if( typeof(wb) == "undefined" )
                     for (var name in data){
                         edit_link = edit_link.replace(':'+name, data[name].value);
                     }
-                    //console.log('edit_link2=', edit_link);
                     
                     tr.append($('<td><a href="'+edit_link+'">'+d.value+'</a></td>'));
                 }else{
@@ -221,7 +220,27 @@ if( typeof(wb) == "undefined" )
                 }
                 
             }else if( c.type == 'submit' ){
-                tr.append($('<td>submit</td>'));
+                
+                var del_msg = '';
+                if( 'del_msg' in c ){
+                    del_msg = c.del_msg;
+                    for (var name in data){
+                        del_msg = del_msg.replace(':'+name, data[name].value);
+                    }
+                }
+                
+                var del_link = '';
+                if( 'del_link' in c ){
+                    del_link = c.del_link;
+                    for (var name in data){
+                        del_link = del_link.replace(':'+name, data[name].value);
+                    }
+                    
+                    del_link = '<a onclick="wb.del_confirm(\''+del_link+'\', \''+del_msg+'\', this)" href="javascript:void(0)">del</a>';
+                }
+                
+                tr.append($('<td>submit '+del_link+'</td>'));
+                
             }else if( c.type == 'checkbox' ){
                 
                 var value = d.value;
@@ -273,6 +292,47 @@ if( typeof(wb) == "undefined" )
         }
         
         whereto_d.append(tr);
+    };
+    
+    wb.del_confirm = function(del_link, del_msg, del_anchor){
+        
+        var del_tr = $(del_anchor).parent().parent();
+        
+        new jBox('Confirm', {
+            content: del_msg,
+            confirmButton: 'Delete it',
+            cancelButton: 'Nope',
+            confirm: function(){
+                
+                $.get(del_link, function(data){
+                    
+                    if( data.code == 'ok' ){
+                        
+                        new jBox('Notice', {
+                            content: 'Success delete',
+                            color: 'blue',
+                            onClose: function(){}
+                        });
+                        
+                        del_tr.remove();
+                        
+                    }else{
+                        
+                        new jBox('Notice', {
+                            content: data.err,
+                            color: 'red'
+                        });
+                    }
+                }).fail(function( ev, str1, str2 ){
+                    
+                    new jBox('Notice', {
+                        content: str2,
+                        color: 'red'
+                    });
+                });
+            }
+        }).open();
+        
     };
     
     

@@ -412,6 +412,7 @@ sub list {
     
     # DEPRECATED?
     # list( -gain=>1 )
+=head1    
     for my $ga ( @{$self->{gain}} ) {
         
         # check
@@ -435,6 +436,7 @@ sub list {
             $row->{$ga.'_raw_'} = $self->db->selectall_arrayref( $ga_assign, {Slice=>{}}, $row->{$ga_field}->value );
         }
     }
+=cut
     
     # list( -data=>1 )
     # list( -data=>1, -json=>1 )
@@ -566,22 +568,27 @@ sub update {
     
     my @names = keys %arg;
     my $names = join('=?,', @names); $names .= '=?';
-    my @values = map { '?' } @names;
-    my $values = join(',', @values);
     
-    @values = values %arg;
+    my @values = values %arg;
     push @values, @{$self->{where_arg}};
     
     my $sql = '';
     if ( $self->{where} ) {
         $sql .= 'where '.join(' and ', @{$self->{where}});
-        $sql .= "\n";
     }
     
-    warn "update $self->{table_name} set $names $sql ";
-    warn dumper(\@values);
-    
     $self->db->do("update $self->{table_name} set $names $sql ", undef, @values) or die $self->db->errstr;
+}
+
+sub delete {
+    my $self = shift;
+    
+    my $sql = '';
+    if ( $self->{where} ) {
+        $sql .= 'where '.join(' and ', @{$self->{where}});
+    }
+    
+    $self->db->do("delete from $self->{table_name} $sql ", undef, @{$self->{where_arg}}) or die $self->db->errstr;
 }
 
 

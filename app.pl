@@ -7,7 +7,6 @@ use utf8;
 use lib 'lib';
 use WB::Router qw(:def);
 use WB::Util qw(dumper);
-#use VBoxManage;
 
 
 
@@ -24,12 +23,9 @@ my $app = sub {
         
         secret => '0IkJmbamAN@cboU&hHJxtruU1cI!5Lf4',
         
-        #vboxmanage => new VBoxManage,
-        
     )->dispatch(
         
         root 'Page::index',
-        
         
         get(  '/auth'        => 'Auth::index' ),
         post( '/auth/login'  => 'Auth::login' ),
@@ -39,23 +35,9 @@ my $app = sub {
         
         scope('/admin' => [
             
-            #get('/vm/:uuid' => 'Admin::Vm::show'),
-            #get('/vm/new' => 'Admin::Vm::new'),
-            
-            #resource 'photo',
-            
-            #scope('/admin/inside' => [
-                
-            #    resource 'doc',
-            #]),
-            
             resource 'user',
             resource 'article',
-            
-            #get('/article2' => 'Admin::Article2::index'),
         ]),
-        
-        
     );
 };
 

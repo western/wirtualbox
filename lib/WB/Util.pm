@@ -91,6 +91,12 @@ sub current_sql_datetime{
     $mon ++;
     $year += 1900;
     
+    $mon  = "0$mon"  if( length($mon)<2 );
+    $mday = "0$mday" if( length($mday)<2 );
+    $hour = "0$hour" if( length($hour)<2 );
+    $min  = "0$min"  if( length($min)<2 );
+    $sec  = "0$sec"  if( length($sec)<2 );
+    
     "$year-$mon-$mday $hour:$min:$sec";
 }
 

@@ -8,7 +8,7 @@ use POSIX;
 
 use Model::Article;
 
-#required 'App::auth_required';
+required 'App::auth_required';
 template_layout 'admin';
 
 
@@ -118,6 +118,48 @@ sub create {
     $r->response->json({
         code => 'ok',
         id   => $id,
+    });
+}
+
+sub show {
+    my($self, $r, $args) = @_;
+    
+    
+    my $data = $r->model->Article->where(id => $args->{id})->list( -flat=>1, -json=>1 )->[0];
+    
+    if( !$data ){
+        return $r->response->template404(
+            file => '404',
+            msg        => 'This Article by '.$args->{id}.' is not found',
+            is_article => 1,
+        );
+    }
+    
+    $r->response->template_args(
+        data        => $data,
+        region_list => $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] }, -json_all=>1 ),
+        h1_title    => 'Article show',
+    );
+}
+
+sub del {
+    my($self, $r, $args) = @_;
+    
+    
+    my $data = $r->model->Article->where(id => $args->{id})->list( -flat=>1, -json=>1 )->[0];
+    
+    if( !$data ){
+        
+        return $r->response->json({
+            code => 'err',
+            err  => 'This Article by '.$args->{id}.' is not found',
+        });
+    }
+    
+    $r->model->Article->where(id => $args->{id})->delete;
+    
+    $r->response->json({
+        code => 'ok',
     });
 }
 
