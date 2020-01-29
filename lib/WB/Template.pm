@@ -80,13 +80,13 @@ sub template_file{
                 my $func = pop @t;
                 my $pack = join('::', @t);
                 
-                if ( scalar @t > 1 ) {
-                    $result_path = $cwd.'/'.join('/', @t).'/'.$self->{$n}.'.html';
-                    warn "$n set $result_path";
-                } else {
+                #if ( scalar @t > 1 ) {
+                #    $result_path = $cwd.'/'.join('/', @t).'/'.$self->{$n}.'.html';
+                #    warn "$n set $result_path";
+                #} else {
                     $result_path = $cwd.'/Controller/'.join('/', @t).'/'.$self->{$n}.'.html';
                     warn "$n set $result_path";
-                }
+                #}
             }
             
             if ( $result_path && -e $result_path ) {

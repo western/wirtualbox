@@ -23,8 +23,10 @@ if( typeof(wb) == "undefined" )
     
     wb.form_build = function(data, control, whereto){
         
-        data = data.replace(/&apos;/g, "'");
-        data = JSON.parse(data);
+        if ( data != '' ) {
+            data = data.replace(/&apos;/g, "'");
+            data = JSON.parse(data);
+        }
         whereto_d = $(whereto);
         
         
@@ -35,16 +37,19 @@ if( typeof(wb) == "undefined" )
             var d = data[c.name];
             var id = whereto_d.attr('id')+'_'+c.name;
             
-            
+            var d_value = '';
+            if( d != undefined ){
+                d_value = d.value;
+            }
             
             if( c.type == 'hidden' ){
-                var inp = $('<input type="hidden" id="'+id+'" name="'+c.name+'" value="'+d.value+'">');
+                var inp = $('<input type="hidden" id="'+id+'" name="'+c.name+'" value="'+d_value+'">');
                 whereto_d.append(inp);
             }else if( c.type == 'edit' ){
                 var wrap = $('<div class="form-group">');
                 var label = $('<label for="'+id+'">');
                 label.append(document.createTextNode(c.label));
-                var inp = $('<input type="text" class="form-control" id="'+id+'" name="'+c.name+'" value="'+d.value+'">');
+                var inp = $('<input type="text" class="form-control" id="'+id+'" name="'+c.name+'" value="'+d_value+'">');
                 wrap.append(label);
                 wrap.append(inp);
                 if( 'note' in c ){
@@ -61,7 +66,7 @@ if( typeof(wb) == "undefined" )
                 var label = $('<label class="form-check-label" for="'+id+'">');
                 label.append(document.createTextNode(c.label));
                 var inp = $('<input type="checkbox" class="form-check-input" id="'+id+'" name="'+c.name+'" value="'+c.value_chk+'">');
-                if( d.value == c.value_chk ){
+                if( d_value == c.value_chk ){
                     inp.attr('checked', 'checked');
                 }
                 wrap.append(inp);
@@ -77,7 +82,7 @@ if( typeof(wb) == "undefined" )
                 var select = $('<select class="form-control" id="'+id+'" name="'+c.name+'" >');
                 for(var a=0; a<c.option.length; a++){
                     var opt = c.option[a];
-                    if( opt[0] == d.value ){
+                    if( opt[0] == d_value ){
                         select.append($('<option value="'+opt[0]+'" selected="selected" >'+opt[1]+'</option>'));
                     }else{
                         select.append($('<option value="'+opt[0]+'" >'+opt[1]+'</option>'));
@@ -93,7 +98,7 @@ if( typeof(wb) == "undefined" )
                 var wrap = $('<div class="form-group">');
                 var label = $('<label for="'+id+'">');
                 label.append(document.createTextNode(c.label));
-                var textarea = $('<textarea class="form-control" id="'+id+'" name="'+c.name+'">'+d.value+'</textarea>');
+                var textarea = $('<textarea class="form-control" id="'+id+'" name="'+c.name+'">'+d_value+'</textarea>');
                 wrap.append(label);
                 wrap.append(textarea);
                 if( 'note' in c ){
@@ -104,7 +109,7 @@ if( typeof(wb) == "undefined" )
                 var wrap = $('<div class="form-group">');
                 var label = $('<label for="'+id+'">');
                 label.append(document.createTextNode(c.label));
-                var textarea = $('<textarea class="form-control" id="'+id+'" name="'+c.name+'">'+d.value+'</textarea>');
+                var textarea = $('<textarea class="form-control" id="'+id+'" name="'+c.name+'">'+d_value+'</textarea>');
                 wrap.append(label);
                 wrap.append(textarea);
                 if( 'note' in c ){
@@ -116,10 +121,13 @@ if( typeof(wb) == "undefined" )
                 var label = $('<label for="'+id+'">');
                 label.append(document.createTextNode(c.label));
                 var select = $('<select class="form-control" id="'+id+'" name="'+c.name+'" >');
+                if( c.empty_option ){
+                    select.append($('<option value="0" >[ non selected ]</option>'));
+                }
                 if( 'option' in c ){
                     for(var a=0; a<c.option.length; a++){
                         var opt = c.option[a];
-                        if( opt[0] == d.value ){
+                        if( opt[0] == d_value ){
                             select.append($('<option value="'+opt[0]+'" selected="selected" >'+opt[1]+'</option>'));
                         }else{
                             select.append($('<option value="'+opt[0]+'" >'+opt[1]+'</option>'));
@@ -134,6 +142,52 @@ if( typeof(wb) == "undefined" )
                 whereto_d.append(wrap);
             }
         }
+        
+        whereto_d.on('submit', function(ev){
+            
+            event.preventDefault();
+            //console.log('form submit');
+            // whereto_d.attr('action')
+            
+            
+            
+            $.post(
+                whereto_d.attr('action'),
+                $(this).serialize()
+            ).done(function( data ){
+                
+                console.log( "Data Loaded: " + data );
+                console.log(arguments);
+                
+                new jBox('Notice', {
+                    content: 'success!!!1',
+                    color: 'blue'
+                });
+                
+            }).fail(function( ev, str1, str2 ){
+                //alert( "error" );
+                //console.log(arguments);
+                
+                new jBox('Notice', {
+                    content: str2,
+                    color: 'red'
+                });
+                
+                /*
+                new jBox('Modal', {
+                    width: 300,
+                    height: 100,
+                    title: str1,
+                    content: str2
+                }).open();
+                */
+            });
+            
+            //console.log( $(this).serialize() );
+            
+            return false;
+        });
+        
         
         
     };

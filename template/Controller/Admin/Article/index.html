@@ -1,7 +1,12 @@
 
 <div class="container">
+    
     <div class="row">
         <h1>Article</h1>
+    </div>
+    
+    <div class="row">
+        <a href="/admin/article/new"><img src="/capicon/png/black/046.png"> create new</a>
     </div>
     
     <div class="row">
@@ -37,9 +42,9 @@
                     var region_list = <TMPL_VAR region_list>;
                 </script>
                 
-                <TMPL_LOOP NAME=list>
+                <TMPL_LOOP list>
                     <script>
-                        wb.make_tr('<TMPL_VAR name="row">', [
+                        wb.make_tr('<TMPL_VAR row>', [
                             {name: 'id', type: 'label'},
                             {name: 'title', type: 'edit', label: 'Заголовок', edit_link: '/admin/article/:id/edit'},
                             {name: 'status', type: 'enum', label: 'Статус', option: [['draft', 'Draft'], ['publish', 'Publish']]},

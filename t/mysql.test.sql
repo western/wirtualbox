@@ -7,15 +7,18 @@ drop table if exists user;
 
 create table user(
     id int unsigned not null primary key auto_increment,
-    login varchar(50) not null default '',
-    password varchar(50) not null default '',
+    login varchar(128) not null default '',
+    password varchar(512) not null default '',
+    status enum('online', 'offline') not null default 'offline',
     name varchar(512) not null default '',
     registered datetime not null,
-    changed datetime
+    changed datetime,
+    unique key login(login),
+    key login_status(login, status)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
-insert into user(login, password, name, registered) values('login1', 'password1', 'name1', now());
-insert into user(login, password, name, registered) values('login2', 'password2', 'name2', now());
+insert into user(login, password, name, status, registered) values('login1', md5(concat('login1', 'password1')), 'name1', 'online', now());
+insert into user(login, password, name, status, registered) values('login2', md5(concat('login2', 'password2')), 'name2', 'offline', now());
 
 
 drop table if exists perm;
@@ -31,7 +34,8 @@ insert into perm(name) values('user_new'), ('user_edit'), ('user_view');
 insert into perm(name) values('article_new'), ('article_edit'), ('article_view');
 insert into perm(name) values('region_new'), ('region_edit'), ('region_view');
 insert into perm(name) values('comment_new'), ('comment_edit'), ('comment_view'), ('comment_moder');
-insert into perm(name) values('doc_new'), ('doc_edit'), ('doc_view'), ('doc_moder');
+insert into perm(name) values('doc_new'), ('doc_edit'), ('doc_view'), ('doc_publish');
+insert into perm(name) values('org_new'), ('org_edit'), ('org_view');
 
 
 drop table if exists user_perm;
@@ -134,5 +138,22 @@ create table doc(
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
+
+
+
+
+
+
+
+drop table if exists org;
+
+create table org(
+    id int unsigned not null primary key auto_increment,
+    title varchar(1024) not null default '',
+    body text,
+    status enum('online', 'offline') not null default 'offline',
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
 
 

@@ -1,5 +1,5 @@
 
-<!-- _TMPL_INCLUDE NAME="_admin_common.html"-->
+
 
 <div class="container">
     
@@ -18,16 +18,16 @@
     
     <div class="row">
         
-        <form class="col-md-12" id="form1" method="post">
+        <form class="col-md-12" id="form1" method="post" action="/admin/article">
             
             <script>
-                wb.form_build('<TMPL_VAR name="data">', [
+                wb.form_build('<TMPL_VAR data>', [
                     {name: 'id', type: 'hidden'},
                     {name: 'title', type: 'edit', label: 'Заголовок', note: 'Краткое описание статьи'},
                     {name: 'status', type: 'enum', label: 'Статус', option: [['draft', 'Draft'], ['publish', 'Publish']]},
                     {name: 'body', type: 'wysiwyg', label: 'Статья', note: 'Текст статьи'},
                     {name: 'for_first_page', type: 'checkbox', value_chk: 1, label: 'Показывать на главной странице'},
-                    {name: 'region_id', type: 'select', label: 'Регион', option: <TMPL_VAR name="regions">},
+                    {name: 'region_id', type: 'select', label: 'Регион', option: <TMPL_VAR region_list>, empty_option: true},
                     {name: 'submit', type: 'submit', label: 'Сохранить'}
                 ], '#form1');
             </script>

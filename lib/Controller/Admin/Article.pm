@@ -111,13 +111,31 @@ sub edit {
     }
     
     
-    
-    my $regions = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
+    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
     
     $r->response->template_args(
-        data    => $data,
-        regions => JSON::XS->new->utf8->encode($regions),
+        data        => $data,
+        region_list => JSON::XS->new->utf8->encode($region_list),
     );
+}
+
+sub new {
+    my($self, $r, $args) = @_;
+    
+    $r->response->template_file('edit');
+    
+    my $region_list = $r->model->Region->list( -data=>1, -map=>sub{ [$_[0]->{id}, $_[0]->{title}] } );
+    
+    $r->response->template_args(
+        
+        region_list => JSON::XS->new->utf8->encode($region_list),
+    );
+}
+
+sub create {
+    my($self, $r, $args) = @_;
+    
+    
 }
 
 1;
