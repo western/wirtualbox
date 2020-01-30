@@ -90,10 +90,10 @@ sub create {
     
     for my $n (@fields){
         
-        return $r->response->json({
+        return $r->response->json(
             code => 'err',
             err  => "Essential field $n is empty",
-        }) if ( !$r->param($n) );
+        ) if ( !$r->param($n) );
     }
     
     my $uploadfile;
@@ -142,10 +142,10 @@ sub create {
         $id = $article->{id};
     }
     
-    $r->response->json({
+    $r->response->json(
         code => 'ok',
         id   => $id,
-    });
+    );
 }
 
 sub show {
@@ -177,17 +177,17 @@ sub del {
     
     if( !$data ){
         
-        return $r->response->json({
+        return $r->response->json(
             code => 'err',
             err  => 'Article '.$args->{id}.' is not found',
-        });
+        );
     }
     
     $r->model->Article->where(id => $args->{id})->delete;
     
-    $r->response->json({
+    $r->response->json(
         code => 'ok',
-    });
+    );
 }
 
 1;
