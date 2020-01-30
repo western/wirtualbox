@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use WB::Util qw(:def);
 
+use Image::ExifTool qw(:Public);
+
 
 sub new{
     my $c = shift;
@@ -15,6 +17,8 @@ sub new{
         filename => '',
         ext => '',
         size => 0,
+        width => 0,
+        height => 0,
         tempname => '',
         %arg,
     };
@@ -28,25 +32,56 @@ sub new{
     }
     
     bless $self, $class;
+    
+    $self->tempname($self->{tempname});
+    
+    
+    $self;
 }
 
 sub filename{
     my $self = shift;
+    $self->{filename} = $_[0] if ($_[0]);
     $self->{filename};
 }
 
 sub ext{
     my $self = shift;
+    $self->{ext} = $_[0] if ($_[0]);
     $self->{ext};
 }
 
 sub size{
     my $self = shift;
+    $self->{size} = $_[0] if ($_[0]);
     $self->{size};
+}
+
+sub width{
+    my $self = shift;
+    $self->{width} = $_[0] if ($_[0]);
+    $self->{width};
+}
+
+sub height{
+    my $self = shift;
+    $self->{height} = $_[0] if ($_[0]);
+    $self->{height};
 }
 
 sub tempname{
     my $self = shift;
+    $self->{tempname} = $_[0] if ($_[0]);
+    
+    if( $self->{tempname} && -f $self->{tempname} ){
+        
+        my $info = ImageInfo($self->{tempname});
+        
+        $self->size( -s $self->{tempname} );
+        $self->width( $info->{ImageWidth} );
+        $self->height( $info->{ImageHeight} );
+    }
+    
     $self->{tempname};
 }
 
@@ -59,24 +94,12 @@ sub tempname{
         );
     }
     
-    or
-    
-    if( my $photo = $r->param('photo') ){
-        
-        $photo->upload_to(
-            path => $r->{env}{root}.'/htdocs/img/',
-        );
-    }
-    
 =cut
 sub upload_to{
     my $self = shift;
     my %arg = @_;
     
     my $save_full_name = '';
-    if( $arg{path} ){
-        $save_full_name = $arg{path}.'/'.$self->{filename};
-    }
     if( $arg{full_path} ){
         $save_full_name = $arg{full_path};
     }

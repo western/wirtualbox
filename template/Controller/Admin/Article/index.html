@@ -26,8 +26,9 @@
     
     
     
-    
-    <ul class="pagination" ></ul>
+    <div class="row">
+        <ul class="pagination" ></ul>
+    </div>
     
     <div class="row">
         <table class="table table-striped table-hover">
@@ -70,20 +71,22 @@
         </table>
     </div>
     
-    
-    <p>
-        All count: <TMPL_VAR NAME=list_count>
-    </p>
-    
-    
-    <ul class="pagination" ></ul>
-    
-    
-    <form id="form_filter">
-        <input type="hidden" name="filter_page" id="filter_page" value="<TMPL_VAR NAME=filter_page>">
+    <div class="row">
+        <p>
+            All count: <TMPL_VAR NAME=list_count>
+        </p>
         
-    </form>
+        <ul class="pagination" ></ul>
+    </div>
     
+    
+    
+    <div class="row">
+        <form id="form_filter">
+            <input type="hidden" name="filter_page" id="filter_page" value="<TMPL_VAR NAME=filter_page>">
+            
+        </form>
+    </div>
     
     
 </div>

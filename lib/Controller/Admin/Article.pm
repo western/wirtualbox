@@ -52,7 +52,9 @@ sub edit {
     my($self, $r, $args) = @_;
     
     
-    my $data = $r->model->Article->where(id => $args->{id})->list( -flat=>1, -json=>1 )->[0];
+    my $data = $r->model->Article->join('left uploadfile as artphoto')->where('article.id' => $args->{id})->list( -flat=>1, -json=>0 )->[0];
+    
+    die dumper $data;
     
     if( !$data ){
         return $r->response->template404(
@@ -95,28 +97,38 @@ sub create {
         }) if ( !$r->param($n) );
     }
     
-    my $photo_upload = '';
+    my $uploadfile;
     if( my $photo = $r->param('photo') ){
         
-        $photo_upload = '/file/'.$photo->filename;
+        my $photo_upload = '/file/'.$photo->filename;
         
         $photo->upload_to(
             full_path => $r->{env}{root}.'/htdocs/file/'.$photo->filename,
         );
-    }
-    
-    # remove previous photo
-    if( $photo_upload ){
         
+        $uploadfile = $r->model->Uploadfile->insert(
+            model      => 'article',
+            path       => $photo_upload,
+            filename   => $photo->filename,
+            ext        => $photo->ext,
+            width      => $photo->width,
+            height     => $photo->height,
+            size       => $photo->size,
+            registered => current_sql_datetime,
+        );
     }
     
     my $id = $r->param('id');
     if( $id ){
         
+        # remove previous photo
+        #if( $uploadfile ){
+        #}
+        
         my %r = map { $_ => $r->param($_) } @fields;
         $r{for_first_page} = $r->param('for_first_page') || 0;
         $r{changed}        = current_sql_datetime;
-        $r{photo}          = $photo_upload if ($photo_upload);
+        $r{photo}          = $uploadfile->{id} if ($uploadfile);
         
         $r->model->Article->where( id => $id )->update( %r );
         
@@ -126,9 +138,10 @@ sub create {
         $r{for_first_page} = $r->param('for_first_page') || 0;
         $r{user_id}        = 1;
         $r{registered}     = current_sql_datetime;
-        $r{photo}          = $photo_upload if ($photo_upload);
+        $r{photo}          = $uploadfile->{id} if ($uploadfile);
         
-        $id = $r->model->Article->insert( %r );
+        my $article = $r->model->Article->insert( %r );
+        $id = $article->{id};
     }
     
     $r->response->json({

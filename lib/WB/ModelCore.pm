@@ -158,7 +158,10 @@ sub _sql_compile {
     } else {
         if ( $self->{fields} ) {
             for my $f ( @{$self->{fields}} ) {
+                
                 $sql .= $f->{name_full}.', ';
+                #$sql .= $f->{name_full}.' '.$f->{tablename}.'_'.$f->{name}.', ' if ( $f->{tablename} ne $self->{table_name} );
+                #$sql .= $f->{name_full}.', ' if ( $f->{tablename} eq $self->{table_name} );
             }
             $sql =~ s!, $!!;
             $sql .= "\n";
@@ -289,13 +292,13 @@ sub offset {
     $self;
 }
 
-sub gain {
-    my $self = shift;
-    
-    push @{$self->{gain}}, @_;
-    
-    $self;
-}
+# sub gain {
+#     my $self = shift;
+#     
+#     push @{$self->{gain}}, @_;
+#     
+#     $self;
+# }
 
 
 =head2 join
@@ -305,10 +308,23 @@ sub gain {
     join( 'left outer users' )
     join( 'users' => 'users.id = article.user_id' )
     
+    join( 'users as persons' )
+    join( 'left users as persons' )
+    join( 'left outer users as persons' )
+    join( 'users as persons' => 'users.id = article.user_id' )
+    
 =cut
 sub join {
     my $self = shift;
-    my @table_expect = split(/\s+/, shift);
+    
+    my $table_without_alias = shift;
+    my $alias = '';
+    if( $table_without_alias =~ m! as (\w+)! ){
+        $alias = $1;
+        $table_without_alias =~ s! as (\w+)!!;
+    }
+    
+    my @table_expect = split(/\s+/, $table_without_alias);
     my $on_option    = shift;
     
     # join( 'left users' )
@@ -323,6 +339,7 @@ sub join {
         push @{$self->{join}}, {
             prefix => join(' ', @table_expect),
             table  => $table,
+            alias  => $alias,
             on     => $on_option ? $on_option : $self->_get_join_options( $table ),
         };
     } else {
@@ -335,6 +352,7 @@ sub join {
         push @{$self->{join}}, {
             prefix => 'inner',
             table  => $table_expect[0],
+            alias  => $alias,
             on     => $on_option ? $on_option : $self->_get_join_options( $table_expect[0] ),
         };
     }
@@ -380,6 +398,14 @@ sub list {
     
     
     
+#     my @fields = map {
+#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name}.' '.$_->{tablename}.'_'.$_->{name} : $_->{name}
+#     } @{$self->{fields}};
+#     
+#     my %fields = map {
+#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name}.' '.$_->{tablename}.'_'.$_->{name} : $_->{name} => $_
+#     } @{$self->{fields}};
+
     my @fields = map {
         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name}
     } @{$self->{fields}};
@@ -387,6 +413,7 @@ sub list {
     my %fields = map {
         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name} => $_
     } @{$self->{fields}};
+    
     
     # @fields has contain:
     # [
@@ -558,7 +585,8 @@ sub insert {
     $self->db->do("insert into $self->{table_name} ($names) values ($values) ", undef, @values) or die $self->db->errstr;
     
     if ( $self->{driver} eq 'mysql' ) {
-        return $self->db->{mysql_insertid};
+        
+        return $self->db->selectrow_hashref( "select * from $self->{table_name} where $self->{primary_name}=?", undef, $self->db->{mysql_insertid} );
     }
 }
 

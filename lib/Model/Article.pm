@@ -14,6 +14,8 @@ __PACKAGE__->belong_to( user_id => 'user.id' );
 
 __PACKAGE__->belong_to( region_id => 'region.id' );
 
+__PACKAGE__->belong_to( photo => 'uploadfile.id' );
+
 __PACKAGE__->has_many( id => 'comment.article_id' );
 
 1;

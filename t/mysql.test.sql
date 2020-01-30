@@ -1,5 +1,6 @@
 
 /* mysql -h 127.0.0.1 -u test -p test */
+/* mysql -h 127.0.0.1 -u test -p test < mysql.test.sql */
 /* grant all privileges on test.* to test@127.0.0.1 identified by 'test'; */
 
 
@@ -78,7 +79,7 @@ create table article(
     body text,
     status enum('draft', 'publish') not null default 'draft',
     for_first_page bool not null default 0,
-    photo varchar(512) not null default '',
+    photo int unsigned,
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -169,8 +170,24 @@ drop table if exists org;
 create table org(
     id int unsigned not null primary key auto_increment,
     title varchar(1024) not null default '',
+    logo int unsigned,
     body text,
     status enum('online', 'offline') not null default 'offline',
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+drop table if exists uploadfile;
+
+create table uploadfile(
+    id int unsigned not null primary key auto_increment,
+    model varchar(128) not null default '',
+    path varchar(1024) not null default '',
+    filename varchar(64) not null default '',
+    ext varchar(12) not null default '',
+    width int unsigned not null default 0,
+    height int unsigned not null default 0,
+    size int unsigned not null default 0,
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
