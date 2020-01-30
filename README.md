@@ -4,6 +4,8 @@
 ##### Small - all current version code contained in several packages:
 * DB
 * File - Class support for upload files
+* Model - Control of /lib/Model
+* ModelCore - Base class for all models
 * Request
 * Response
 * Router - Main work class
