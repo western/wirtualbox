@@ -13,7 +13,9 @@ sub connect{
     
     my $db = DBI->connect_cached($arg{dsn}, $arg{login}, $arg{password}, {RaiseError => 1}) or die DBI->errstr;
     
-    $db->do('set names utf8') or die $db->errstr;
+    if( $arg{dsn} =~ m!mysql! ){
+        $db->do('set names utf8') or die $db->errstr;
+    }
     
     $db;
 }
