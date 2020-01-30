@@ -34,5 +34,8 @@ getfontawesome:
 	cd htdocs ; \
 	rm -rf fontawesome-free-5.12.0-web ; \
 	wget https://use.fontawesome.com/releases/v5.12.0/fontawesome-free-5.12.0-web.zip && unzip fontawesome-free-5.12.0-web.zip && rm fontawesome-free-5.12.0-web.zip
+gettinymce:
+	cd htdocs ; \
+	wget https://download.tiny.cloud/tinymce/community/tinymce_5.1.6_dev.zip && unzip tinymce_5.1.6_dev.zip && rm tinymce_5.1.6_dev.zip
 test:
 	prove
