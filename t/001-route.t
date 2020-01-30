@@ -1,7 +1,7 @@
 
 use Test::More tests => 1;
 
-use lib 'lib';
+
 use WB::Router qw(:def);
 use WB::Util qw(dumper);
 

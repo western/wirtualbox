@@ -6,6 +6,7 @@ use warnings;
 use WB::Util qw(:def);
 
 use Image::ExifTool qw(:Public);
+use Digest::MD5::File qw(file_md5_hex);
 
 
 sub new{
@@ -15,11 +16,13 @@ sub new{
     
     my $self = {
         filename => '',
-        ext => '',
-        size => 0,
-        width => 0,
-        height => 0,
+        ext      => '',
+        size     => 0,
+        width    => 0,
+        height   => 0,
         tempname => '',
+        md5      => '',
+        
         %arg,
     };
     
@@ -69,6 +72,12 @@ sub height{
     $self->{height};
 }
 
+sub md5{
+    my $self = shift;
+    $self->{md5} = $_[0] if ($_[0]);
+    $self->{md5};
+}
+
 sub tempname{
     my $self = shift;
     $self->{tempname} = $_[0] if ($_[0]);
@@ -80,6 +89,7 @@ sub tempname{
         $self->size( -s $self->{tempname} );
         $self->width( $info->{ImageWidth} );
         $self->height( $info->{ImageHeight} );
+        $self->md5( file_md5_hex($self->{tempname}) );
     }
     
     $self->{tempname};
@@ -91,6 +101,7 @@ sub tempname{
         
         $photo->upload_to(
             full_path => $r->{env}{root}.'/htdocs/img/'.$photo->filename,
+            rewrite   => 0
         );
     }
     

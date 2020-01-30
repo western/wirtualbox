@@ -37,6 +37,8 @@ my $app = sub {
             
             resource 'user',
             resource 'article',
+            
+            get('/test/orm' => 'Admin::Test::orm'),
         ]),
     );
 };

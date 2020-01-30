@@ -170,9 +170,11 @@ drop table if exists org;
 create table org(
     id int unsigned not null primary key auto_increment,
     title varchar(1024) not null default '',
+    
     logo int unsigned,
     body text,
     status enum('online', 'offline') not null default 'offline',
+    
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -181,13 +183,17 @@ drop table if exists uploadfile;
 
 create table uploadfile(
     id int unsigned not null primary key auto_increment,
-    model varchar(128) not null default '',
-    path varchar(1024) not null default '',
+    model varchar(64) not null default '',
+    
+    path varchar(512) not null default '',
     filename varchar(64) not null default '',
+    
     ext varchar(12) not null default '',
     width int unsigned not null default 0,
     height int unsigned not null default 0,
     size int unsigned not null default 0,
+    md5 varchar(32) not null default '',
+    
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;

@@ -15,15 +15,14 @@ use Cwd;
 
 our $VERSION = '0.3';
 
-# Конечно, счастье есть на свете,
-# Монетку ты скорее дай,
-# И заколдованный билетик,
-# Тебе протянет попугай.
-# 
-# Предъяви билетик этот поздно или рано,
-# У судьбы получите счастья без обмана,
-# Счастья без обмана, счастья без обмана,
-# Вам судьба с улыбкою вынет из кармана.
+# The sky is red, I don't understand
+# Past midnight, I still see the land
+# People are sayin' the woman is damned
+# She makes you burn with a wave of her hand
+# The city's ablaze, the town's on fire
+# The woman's flames are reaching higher
+# We were fools, we called her liar
+# All I hear is "Burn!"
 
 our @EXPORT_OK = (qw(
     root resource get post scope

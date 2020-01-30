@@ -3,10 +3,9 @@ package Controller::Admin::Article;
 
 use utf8;
 use WB::Util qw(:def);
-use WB::Model;
 use POSIX;
 
-use Model::Article;
+
 
 required 'App::auth_required';
 template_layout 'admin';
@@ -52,9 +51,9 @@ sub edit {
     my($self, $r, $args) = @_;
     
     
-    my $data = $r->model->Article->join('left uploadfile as artphoto')->where('article.id' => $args->{id})->list( -flat=>1, -json=>0 )->[0];
+    my $data = $r->model->Article->join('left uploadfile as artphoto')->where('article.id' => $args->{id})->list( -flat=>1, -json=>1 )->[0];
     
-    die dumper $data;
+    #die dumper $data;
     
     if( !$data ){
         return $r->response->template404(
@@ -114,6 +113,7 @@ sub create {
             width      => $photo->width,
             height     => $photo->height,
             size       => $photo->size,
+            md5        => $photo->md5,
             registered => current_sql_datetime,
         );
     }
