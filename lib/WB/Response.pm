@@ -8,7 +8,7 @@ use Cookie::Baker ();
 use JSON::XS;
 use Crypt::CBC;
 
-use WB::Util qw(dumper);
+use WB::Util qw(:def);
 use WB::Template;
 
 
@@ -72,7 +72,7 @@ sub header{
     $self->{header};
 }
 
-=head1 cookie
+=head2 cookie
     
     for parameters read the doc https://metacpan.org/pod/Cookie::Baker
     
@@ -121,6 +121,15 @@ sub body{
     $self->{body};
 }
 
+=head2 json
+    
+    $r->response->json(
+        ddd  => 'ff',
+        a    => 1,
+        some => [99, 95, 3],
+    );
+    
+=cut
 sub json{
     my $self = shift;
     $self->{mode} = 'json';
@@ -222,7 +231,19 @@ sub out{
         push @{$self->{header}}, ('Content-type', 'application/json;charset=utf-8');
         push @{$self->{header}}, ('X-WB', '1');
         
-        $body = [ JSON::XS->new->utf8->encode($body->[0]) ];
+        # batch each pairs as hash elements
+        if ( scalar(@$body) > 1 ) {
+            
+            my $h = {};
+            while (my($name, $value) = splice(@$body, 0, 2)) {
+                $h->{$name} = $value;
+            }
+            $body = [ JSON::XS->new->utf8->encode($h) ];
+            
+        } else {
+            
+            $body = [ JSON::XS->new->utf8->encode($body->[0]) ];
+        }
     }
     
     for my $c (@{$self->{cookie}}){
