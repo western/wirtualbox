@@ -39,9 +39,7 @@ use WB::Type::Datetime;
 # Ghost riders in the sky
 
 
-# init data 
-#   $WB::ModelCore->{storage}->{Package::Name}->{has_many}
-#   $WB::ModelCore->{storage}->{Package::Name}->{belong_to}
+
 our $storage = {};
 
 
@@ -77,9 +75,8 @@ sub db {
 
 sub _init {
     my $self = shift;
-    
     my $pack = ref $self;
-    #println_white($pack, ' _init');
+    
     for my $k ( keys %{$WB::ModelCore::storage->{$pack}} ){
         $self->{$k} = $WB::ModelCore::storage->{$pack}->{$k};
     }
@@ -202,7 +199,7 @@ sub _sql_compile {
         $sql .= " offset $self->{offset} " if (defined $self->{offset});
     }
     
-    println_white( "_sql_compile= ", $sql );
+    println_green( 'ModelCore::', "_sql_compile= ", $sql );
     
     $sql;
 }
@@ -238,7 +235,7 @@ sub where {
     
     if( $arg_cnt > 1 && ($arg_cnt % 2) == 0 && $_[0] !~ /\s/ ){
         
-        println_yellow('where :1');
+        println_green('ModelCore::', 'where :1');
         
         while (my($name, $value) = splice(@_, 0, 2)) {
             if( ref $value eq 'ARRAY' ){
@@ -254,7 +251,7 @@ sub where {
         
     }elsif( $arg_cnt > 1 && $_[0] =~ /\s/ ){
         
-        println_yellow('where :2');
+        println_green('ModelCore::', 'where :2');
         
         # where( 'name like ?', 'first%' )
         # where( 'name like ? or title like ?', 'first%', 'second%' )
@@ -264,7 +261,7 @@ sub where {
         
     }elsif( $arg_cnt == 1 && $_[0] =~ /\s/ ){
         
-        println_yellow('where :3');
+        println_green('ModelCore::', 'where :3');
         
         # where( 'id = 99' )
         

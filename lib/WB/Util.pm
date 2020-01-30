@@ -20,16 +20,18 @@ our @EXPORT_OK = (
     qw(url_escape url_unescape),
     qw(dumper current_sql_datetime required template_layout),
     qw(encode_json decode_json),
-    qw(println_red println_yellow println_white),
+    qw(println_red println_yellow println_white println_green println_blue println_magenta println_cyan),
 );
 
 our %EXPORT_TAGS = (
     def => [qw(
         dumper current_sql_datetime required template_layout
         encode_json decode_json
-        println_red println_yellow println_white
+        println_red println_yellow println_white println_green println_blue println_magenta println_cyan
     )]
 );
+
+
 
 sub println_red {
     print color('bold red').join(' ', @_).color('reset')."\n";
@@ -42,6 +44,24 @@ sub println_yellow {
 sub println_white {
     print color('bold white').join(' ', @_).color('reset')."\n";
 }
+
+sub println_green {
+    print color('bold green').join(' ', @_).color('reset')."\n";
+}
+
+sub println_blue {
+    print color('bold blue').join(' ', @_).color('reset')."\n";
+}
+
+sub println_magenta {
+    print color('bold magenta').join(' ', @_).color('reset')."\n";
+}
+
+sub println_cyan {
+    print color('bold cyan').join(' ', @_).color('reset')."\n";
+}
+
+
 
 sub decode {
     my ($encoding, $bytes) = @_;

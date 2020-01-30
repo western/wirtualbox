@@ -4,9 +4,10 @@ package WB::Template;
 use strict;
 use warnings;
 
-use WB::Util qw(dumper);
+use WB::Util qw(:def);
 
 use Cwd;
+
 
 
 sub new{
@@ -69,12 +70,12 @@ sub template_file{
             # if layout
             if ( !$result_path && -e $cwd.'/'.$self->{$n}.'.html' ) {
                 $result_path = $cwd.'/'.$self->{$n}.'.html';
-                warn "$n set1 $result_path";
+                println_cyan('Template::', "$n set1 $result_path");
             }
             
             #if ( !$result_path && -e $cwd.'/Controller/'.$self->{$n}.'.html' ) {
             #    $result_path = $cwd.'/'.$self->{$n}.'.html';
-            #    warn "$n set2 $result_path";
+            #    println_cyan('Template::', "$n set2 $result_path");
             #}
             
             # if set simple name "template_file"
@@ -85,12 +86,12 @@ sub template_file{
                 pop @t;
                 
                 $result_path = $cwd.'/Controller/'.join('/', @t).'/'.$self->{$n}.'.html';
-                warn "$n set3 $result_path";
+                println_cyan('Template::', "$n set3 $result_path");
             }
             
             if ( $result_path && -e $result_path ) {
                 $self->{$n} = $result_path;
-                warn "$n is $result_path";
+                println_cyan('Template::', "$n is $result_path");
             }
         }
     }

@@ -145,6 +145,9 @@ sub template_file($$){
     my $to = $self->{template_object};
     
     if( $file && $to ){
+        
+        #warn "[$file] [$template_main]";
+        
         $to->{template_change} = 'action';
         $to->template_file( $file, $template_main );
     }
