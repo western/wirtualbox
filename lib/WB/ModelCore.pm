@@ -55,6 +55,14 @@ sub new {
         table_name   => undef,
         primary_name => undef, # primary key field name
         
+        fields    => [],
+        where     => [],
+        where_arg => [],
+        join      => [],
+        limit     => undef,
+        offset    => undef,
+        orderby   => [],
+        
         %arg
     };
     
@@ -146,39 +154,45 @@ sub _sql_compile {
     my $self = shift;
     my %arg = @_;
     
-    my $sql = "select ";
     
+    my $field_list = '';
     if ( $arg{is_count} ) {
         
-        $sql .= "count(*) cnt\n";
+        $field_list .= "count(*) cnt\n";
         
     } else {
         if ( $self->{fields} ) {
             for my $f ( @{$self->{fields}} ) {
                 
-                $sql .= $f->{name_full}.', ';
-                #$sql .= $f->{name_full}.' '.$f->{tablename}.'_'.$f->{name}.', ' if ( $f->{tablename} ne $self->{table_name} );
-                #$sql .= $f->{name_full}.', ' if ( $f->{tablename} eq $self->{table_name} );
+                $field_list .= $f->{name_full}.', ';
             }
-            $sql =~ s!, $!!;
-            $sql .= "\n";
+            $field_list =~ s!, $!!;
         } else {
-            $sql .= "* \n";
+            $field_list .= "* ";
         }
     }
     
-    $sql .= "from $self->{table_name} \n";
     
+    my $sql = "from $self->{table_name} \n";
     for my $j ( @{$self->{join}} ) {
+        
         # prefix contain: left, inner, outer
         $sql .= $j->{prefix}.' ' if ( $j->{prefix} );
-        $sql .= 'join '.$j->{table}."\n";
+        $sql .= 'join '.$j->{table};
+        $sql .= ' '.$j->{alias} if ( $j->{alias} );
+        $sql .= "\n";
+        
+        if( $j->{alias} ){
+            $j->{on}    =~ s!$j->{table}!$j->{alias}!g;
+            $field_list =~ s!$j->{table}!$j->{alias}!g;
+        }
+        
         $sql .= ' on '.$j->{on}."\n";
     }
     
     $sql .= "\n";
     
-    if ( $self->{where} ) {
+    if ( $self->{where} && scalar @{$self->{where}} ) {
         $sql .= 'where '.join(' and ', @{$self->{where}});
         $sql .= "\n";
     }
@@ -199,9 +213,12 @@ sub _sql_compile {
         $sql .= " offset $self->{offset} " if (defined $self->{offset});
     }
     
-    println_green( 'ModelCore::', "_sql_compile= ", $sql );
+    println_green( 'ModelCore::', '_sql_compile=', '[field_list]', $field_list );
+    println_green( 'ModelCore::', '_sql_compile=', '[sql]', $sql );
     
-    $sql;
+    
+    
+    ($field_list, $sql);
 }
 
 =head2 select
@@ -289,13 +306,7 @@ sub offset {
     $self;
 }
 
-# sub gain {
-#     my $self = shift;
-#     
-#     push @{$self->{gain}}, @_;
-#     
-#     $self;
-# }
+
 
 
 =head2 join
@@ -354,7 +365,7 @@ sub join {
         };
     }
     
-    #warn '$self->{join}= '.dumper $self->{join};
+    warn "self->{join} ".dumper($self->{join});
     
     
     $self;
@@ -380,12 +391,21 @@ sub _get_join_options {
     }
 }
 
+=head2 _reset
+    
+    For clear prepare meta after get all data
+    
+=cut
 sub _reset {
     my $self = shift;
     
-    $self->{where} = $self->{where_arg} = undef;
+    $self->{fields} = [];
+    $self->_fields_from_table( $self->{table_name} );
+    
+    $self->{where} = $self->{where_arg} = [];
     $self->{join} = $self->{gain} = [];
-    $self->{limit} = $self->{offset} = $self->{orderby} = undef;
+    $self->{limit} = $self->{offset} = undef;
+    $self->{orderby} = [];
 }
 
 sub list {
@@ -393,22 +413,24 @@ sub list {
     my %arg  = @_;
     
     
-    
-    
 #     my @fields = map {
-#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name}.' '.$_->{tablename}.'_'.$_->{name} : $_->{name}
+#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name}
 #     } @{$self->{fields}};
 #     
 #     my %fields = map {
-#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name}.' '.$_->{tablename}.'_'.$_->{name} : $_->{name} => $_
+#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name} => $_
 #     } @{$self->{fields}};
-
+    
+    #my @fields = map {
+    #    $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name}
+    #} @{$self->{fields}};
+    
     my @fields = map {
-        $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name}
+        $_->{tablename}.'.'.$_->{name}
     } @{$self->{fields}};
     
     my %fields = map {
-        $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name} => $_
+        $_->{tablename}.'.'.$_->{name} => $_
     } @{$self->{fields}};
     
     
@@ -420,7 +442,7 @@ sub list {
     
     my $list2;
     
-    
+=head1    
     my $list = $self->db->selectall_arrayref( $self->_sql_compile, undef, @{$self->{where_arg}} );
     for my $row ( @$list ) {
         my $row2 = {};
@@ -433,34 +455,34 @@ sub list {
         }
         push @$list2, $row2;
     }
+=cut    
     
-    # DEPRECATED?
-    # list( -gain=>1 )
-=head1    
-    for my $ga ( @{$self->{gain}} ) {
+    my($field_list, $sql) = $self->_sql_compile;
+    my @field_list = split(/,/, $field_list);
+    @field_list = map { $_=~s!`!!g; $_=~s!^\s+|\s+$!!g; $_; } @field_list;
+    
+    #die dumper(\@field_list);
+    println_green('ModelCore::', '[full_select]', 'select '.$field_list.' '.$sql);
+    
+    my $list = $self->db->selectall_arrayref( 'select '.$field_list.' '.$sql, undef, @{$self->{where_arg}} );
+    for my $values ( @$list ) {
+        my $row2 = {};
         
-        # check
-        my $ga_assign = '';
-        my $ga_field = '';
-        for my $f (qw(belong_to has_many)){
-            for my $el ( @{$self->{$f}} ) {
-                my @t = split(/\./, $el->[1]);
+        for ( my $i=0; $i<scalar @$values; $i++ ) {
+            for my $fn ( @fields ){
                 
-                if( $ga eq $t[0] ){
-                    
-                    $ga_assign = "select * from $ga where $el->[1] = ? ";
-                    $ga_field  = $el->[0];
-                }
+                warn "fn [$fn]";
+                
+                my $obj = dclone $fields{$fn};
+                $obj->{value} = decode('UTF-8', $values->[$i]);
+                
+                $row2->{$fn} = $obj;
             }
         }
-        
-        # set for each row
-        for my $row ( @$list2 ) {
-            
-            $row->{$ga.'_raw_'} = $self->db->selectall_arrayref( $ga_assign, {Slice=>{}}, $row->{$ga_field}->value );
-        }
+        push @$list2, $row2;
     }
-=cut
+    
+    die dumper $list2;
     
     # list( -data=>1 )
     # list( -data=>1, -json=>1 )
@@ -485,7 +507,6 @@ sub list {
         if ( my $m = $arg{-map} ) {
             
             my @list3;
-            
             for my $row ( @$list2 ) {
                 push @list3, $m->( $row );
             }
@@ -561,7 +582,9 @@ sub list {
 sub count {
     my $self = shift;
     
-    my $data = $self->db->selectrow_hashref( $self->_sql_compile(is_count => 1), undef, @{$self->{where_arg}} );
+    my($field_list, $sql) = $self->_sql_compile(is_count => 1);
+    
+    my $data = $self->db->selectrow_hashref( 'select '.$field_list.' '.$sql, undef, @{$self->{where_arg}} );
     
     $self->_reset;
     

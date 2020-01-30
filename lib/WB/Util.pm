@@ -34,31 +34,31 @@ our %EXPORT_TAGS = (
 
 
 sub println_red {
-    print color('bold red').join(' ', @_).color('reset')."\n";
+    print color('bold red').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 sub println_yellow {
-    print color('bold yellow').join(' ', @_).color('reset')."\n";
+    print color('bold yellow').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 sub println_white {
-    print color('bold white').join(' ', @_).color('reset')."\n";
+    print color('bold white').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 sub println_green {
-    print color('bold green').join(' ', @_).color('reset')."\n";
+    print color('bold green').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 sub println_blue {
-    print color('bold blue').join(' ', @_).color('reset')."\n";
+    print color('bold blue').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 sub println_magenta {
-    print color('bold magenta').join(' ', @_).color('reset')."\n";
+    print color('bold magenta').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 sub println_cyan {
-    print color('bold cyan').join(' ', @_).color('reset')."\n";
+    print color('bold cyan').shift.color('reset').' '.join(' ', @_)."\n";
 }
 
 

@@ -13,7 +13,7 @@ use WB::Util qw(:def);
 use Exporter 'import';
 use Cwd;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 # The sky is red, I don't understand
 # Past midnight, I still see the land
@@ -224,7 +224,7 @@ sub dispatch {
         #    $full_path = $cwd.'/lib/Controller/'.$t[0].'.pm';
         #}
         
-        println_red('Package [', $pack, $func, '] => file [', $full_path, "] is not exists. See route ", dumper($a)) unless ( -e $full_path );
+        println_red('Router::', 'Package [', $pack, $func, '] => file [', $full_path, "] is not exists. See route ", dumper($a)) unless ( -e $full_path );
         
         require $full_path;
         #if ( scalar @t > 1 ) {
@@ -250,7 +250,7 @@ sub dispatch {
             
         } else {
             
-            println_yellow('Package [', $pack, $func, qq~] function "$func" is not exists for "$pack"~);
+            println_yellow('Router::', 'Package [', $pack, $func, qq~] function "$func" is not exists for "$pack"~);
             
             # make dummy sub for show template without action code
             $a->{action_sub} = sub{};
@@ -309,7 +309,7 @@ sub dispatch {
             $response->{template_object}->{template_change} = 'default';
             $response->{template_object}->{template_file}   = $a->{template_file};
             $response->{template_object}->{template_layout} = $a->{template_layout};
-            #die dumper $response;
+            
             
             if ( $a->{require_sub} ) {
                 $a->{action_sub}->($req, \%rx_args) if ($a->{require_sub}->($req, \%rx_args));
@@ -317,8 +317,7 @@ sub dispatch {
                 $a->{action_sub}->($req, \%rx_args);
             }
             
-            #die dumper $response->{route};
-            #die dumper $response;
+            
             
             $response->template_file($a->{template_file}, $a->{template_layout}) if ( $response->{template_object}->{template_change} eq 'default' );
             

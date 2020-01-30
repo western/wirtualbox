@@ -57,8 +57,8 @@ sub edit {
     
     if( !$data ){
         return $r->response->template404(
-            file => '404',
-            msg        => 'This Article by '.$args->{id}.' is not found',
+            file       => '404',
+            msg        => 'Article '.$args->{id}.' is not found',
             is_article => 1,
         );
     }
@@ -99,15 +99,13 @@ sub create {
     my $uploadfile;
     if( my $photo = $r->param('photo') ){
         
-        my $photo_upload = '/file/'.$photo->filename;
-        
         $photo->upload_to(
             full_path => $r->{env}{root}.'/htdocs/file/'.$photo->filename,
         );
         
         $uploadfile = $r->model->Uploadfile->insert(
             model      => 'article',
-            path       => $photo_upload,
+            path       => '/file/'.$photo->filename,
             filename   => $photo->filename,
             ext        => $photo->ext,
             width      => $photo->width,
@@ -158,8 +156,8 @@ sub show {
     
     if( !$data ){
         return $r->response->template404(
-            file => '404',
-            msg        => 'This Article by '.$args->{id}.' is not found',
+            file       => '404',
+            msg        => 'Article '.$args->{id}.' is not found',
             is_article => 1,
         );
     }
@@ -181,7 +179,7 @@ sub del {
         
         return $r->response->json({
             code => 'err',
-            err  => 'This Article by '.$args->{id}.' is not found',
+            err  => 'Article '.$args->{id}.' is not found',
         });
     }
     
