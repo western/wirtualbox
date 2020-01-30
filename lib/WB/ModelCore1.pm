@@ -573,9 +573,9 @@ sub insert {
     my %arg  = @_;
     
     my @names = keys %arg;
-    my $names = join(',', @names);
+    my $names = CORE::join(',', @names);
     my @values = map { '?' } @names;
-    my $values = join(',', @values);
+    my $values = CORE::join(',', @values);
     
     @values = values %arg;
     
@@ -592,14 +592,14 @@ sub update {
     my %arg  = @_;
     
     my @names = keys %arg;
-    my $names = join('=?,', @names); $names .= '=?';
+    my $names = CORE::join('=?,', @names); $names .= '=?';
     
     my @values = values %arg;
     push @values, @{$self->{where_arg}};
     
     my $sql = '';
     if ( $self->{where} ) {
-        $sql .= 'where '.join(' and ', @{$self->{where}});
+        $sql .= 'where '.CORE::join(' and ', @{$self->{where}});
     }
     
     $self->db->do("update $self->{table_name} set $names $sql ", undef, @values) or die $self->db->errstr;
@@ -610,7 +610,7 @@ sub delete {
     
     my $sql = '';
     if ( $self->{where} ) {
-        $sql .= 'where '.join(' and ', @{$self->{where}});
+        $sql .= 'where '.CORE::join(' and ', @{$self->{where}});
     }
     
     $self->db->do("delete from $self->{table_name} $sql ", undef, @{$self->{where_arg}}) or die $self->db->errstr;

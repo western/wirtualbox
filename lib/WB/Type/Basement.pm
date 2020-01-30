@@ -82,7 +82,7 @@ sub get_obj_datetime {
     JSON::XS->new->utf8->decode
     
 =cut
-sub decode_json {
+sub decode_json($) {
     my $self = shift;
     
     JSON::XS->new->utf8->decode( $self->{value} );
@@ -93,7 +93,7 @@ sub decode_json {
     encode hash to string
     
 =cut
-sub encode_json {
+sub encode_json($) {
     my $self = shift;
     
     JSON::XS->new->utf8->encode( $self->{value} );

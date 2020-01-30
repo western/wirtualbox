@@ -1,10 +1,10 @@
 
 
-use Test::More tests => 1;
+use Test::More tests => 3;
 use Cwd;
 
 use lib 'lib';
-use WB::Util qw(dumper);
+use WB::Util qw(:def);
 use WB::DB;
 use WB::Model;
 
@@ -24,7 +24,17 @@ my $model = new WB::Model(
 
 
 
-my $a = $model->Article->limit(1)->list->[0];
-#die dumper $a;
+my $row = $model->Article->limit(1)->list->[0];
+my @fields = keys %$row;
+ok( scalar @fields == 10, 'test 1' );
 
-ok( 1, 'test 1' );
+
+$row = $model->Article->join('user')->limit(1)->list->[0];
+@fields = keys %$row;
+ok( scalar @fields == 17, 'test 2' );
+
+
+$row = $model->Article->join('user')->join('region')->limit(1)->list->[0];
+@fields = keys %$row;
+ok( scalar @fields == 19, 'test 3' );
+
