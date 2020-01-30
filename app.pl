@@ -6,7 +6,7 @@ use utf8;
 
 use lib 'lib';
 use WB::Router qw(:def);
-use WB::Util qw(dumper);
+use WB::Util qw(:def);
 
 
 
@@ -37,9 +37,9 @@ my $app = sub {
             
             resource 'user',
             resource 'article',
-            
-            get('/test/orm' => 'Admin::Test::orm'),
         ]),
+        
+        get('/test/orm' => 'Test::orm'),
     );
 };
 
