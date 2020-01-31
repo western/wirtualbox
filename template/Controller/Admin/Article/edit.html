@@ -26,7 +26,7 @@
                     {name: 'title', type: 'edit', label: 'Заголовок', note: 'Краткое описание статьи'},
                     {name: 'status', type: 'enum', label: 'Статус', option: [['draft', 'Draft'], ['publish', 'Publish']]},
                     {name: 'body', type: 'wysiwyg', label: 'Статья', note: 'Текст статьи'},
-                    {name: 'photo', type: 'file', label: 'Фото'},
+                    {name: 'photo', type: 'file', label: 'Фото', model: 'Uploadfile'},
                     {name: 'for_first_page', type: 'checkbox', value_chk: 1, label: 'Показывать на главной странице'},
                     {name: 'region_id', type: 'select', label: 'Регион', option: <TMPL_VAR region_list>, empty_option: true},
                     {type: 'group_list', label: 'Список регионов'},

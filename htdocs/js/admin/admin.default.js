@@ -65,11 +65,22 @@ if( typeof(wb) == "undefined" )
                 var wrap = $('<div class="form-group">');
                 var label = $('<label for="'+id+'">');
                 label.append(document.createTextNode(c.label));
-                var inp = $('<input type="file" _class="form-control" id="'+id+'" name="'+c.name+'" >');
+                var inp = $('<input type="file" id="'+id+'" name="'+c.name+'" >');
                 wrap.append(label);
                 wrap.append(inp);
                 if( d_value != '' ){
-                    wrap.append($('<a href="'+d_value+'" target="_blank"><img src="'+d_value+'" width="150"></a>'));
+                    
+                    if( 'model' in c ){
+                        $.ajax({
+                            url: '/api/model/'+c.model+'/'+d_value,
+                            async: false
+                        }).done(function(data){
+                            
+                            if( data.code == 'ok' ){
+                                wrap.append($('<a href="'+data.model.path.value+'" target="_blank"><img src="'+data.model.path.value+'" width="150"></a>'));
+                            }
+                        });
+                    }
                 }
                 if( 'note' in c ){
                     wrap.append($('<small class="form-text text-muted">'+c.note+'</small>'));
