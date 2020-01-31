@@ -8,6 +8,7 @@ __PACKAGE__->config( table_name => 'article' );
 __PACKAGE__->config( define_type => {
     'article.body'  => 'Wysiwyg',
     'article.title' => 'Edit',
+    'article.photo' => 'Uploadfile',
 });
 
 __PACKAGE__->belong_to( user_id => 'user.id' );

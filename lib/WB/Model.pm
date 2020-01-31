@@ -76,7 +76,8 @@ sub get_model {
     my $self = shift;
     my $name = shift;
     
-    $self->{models}->{$name} or die "not found model [$name]";
+    #$self->{models}->{$name} or die "not found model [$name]";
+    $self->{models}->{$name};
 }
 
 sub db {

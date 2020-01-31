@@ -31,8 +31,9 @@ my $app = sub {
         post( '/auth/login'  => 'Auth::login' ),
         get(  '/auth/logout' => 'Auth::logout' ),
         
-        get('/admin' => 'Admin::Page::index'),
+        get('/api/model/:name/:id' => 'Api::model'),
         
+        get('/admin' => 'Admin::Page::index'),
         scope('/admin' => [
             
             resource 'user',

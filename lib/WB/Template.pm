@@ -70,12 +70,12 @@ sub template_file{
             # if layout
             if ( !$result_path && -e $cwd.'/'.$self->{$n}.'.html' ) {
                 $result_path = $cwd.'/'.$self->{$n}.'.html';
-                println_cyan('Template::', "$n set1 $result_path");
+                println_cyan('Template::', "$n set sample1 $result_path");
             }
             
             #if ( !$result_path && -e $cwd.'/Controller/'.$self->{$n}.'.html' ) {
             #    $result_path = $cwd.'/'.$self->{$n}.'.html';
-            #    println_cyan('Template::', "$n set2 $result_path");
+            #    println_cyan('Template::', "$n set sample2 $result_path");
             #}
             
             # if set simple name "template_file"
@@ -86,7 +86,7 @@ sub template_file{
                 pop @t;
                 
                 $result_path = $cwd.'/Controller/'.join('/', @t).'/'.$self->{$n}.'.html';
-                println_cyan('Template::', "$n set3 $result_path");
+                println_cyan('Template::', "$n set sample3 $result_path");
             }
             
             if ( $result_path && -e $result_path ) {
