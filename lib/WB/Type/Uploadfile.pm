@@ -1,6 +1,6 @@
 
 package WB::Type::Uploadfile;
 
-use base WB::Type::Varchar;
+use base WB::Type::Int;
 
 1;

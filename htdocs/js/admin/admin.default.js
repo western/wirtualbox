@@ -269,6 +269,27 @@ if( typeof(wb) == "undefined" )
                 
                 tr.append($('<td>submit '+del_link+'</td>'));
                 
+            }else if( c.type == 'file' ){
+                
+                var td = $('<td></td>');
+                
+                if( d.value != '' ){
+                    
+                    if( 'model' in c ){
+                        $.ajax({
+                            url: '/api/model/'+c.model+'/'+d.value,
+                            async: false
+                        }).done(function(data){
+                            
+                            if( data.code == 'ok' ){
+                                td.append($('<a href="'+data.model.path.value+'" target="_blank"><img src="'+data.model.path.value+'" width="50"></a>'));
+                            }
+                        });
+                    }
+                }
+                
+                tr.append(td);
+                
             }else if( c.type == 'checkbox' ){
                 
                 var value = d.value;

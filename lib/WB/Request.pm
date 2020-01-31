@@ -218,7 +218,7 @@ sub upload_file{
         my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
         $mon  ++;
         $year += 1900;
-        $mon  = "0$mon"  if( length($mon)<2 );
+        $mon  = "0$mon"  if( length($mon) <2 );
         $mday = "0$mday" if( length($mday)<2 );
         
         my $path          = $self->{env}{root}.'/htdocs/file/'.$model.'/'.$year.'/'.$mon.'/'.$mday;

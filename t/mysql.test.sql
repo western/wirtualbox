@@ -8,12 +8,15 @@ drop table if exists user;
 
 create table user(
     id int unsigned not null primary key auto_increment,
+    
     login varchar(128) not null default '',
     password varchar(512) not null default '',
     status enum('online', 'offline') not null default 'offline',
     name varchar(512) not null default '',
+    
     registered datetime not null,
     changed datetime,
+    
     unique key login(login),
     key login_status(login, status)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -43,8 +46,10 @@ drop table if exists user_perm;
 
 create table user_perm(
     id int unsigned not null primary key auto_increment,
+    
     user_id int unsigned not null,
     perm_id int unsigned not null,
+    
     registered datetime not null,
     unique key user_perm(user_id, perm_id)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -73,6 +78,7 @@ drop table if exists article;
 
 create table article(
     id int unsigned not null primary key auto_increment,
+    
     user_id int unsigned not null default 0,
     region_id int unsigned not null default 0,
     title varchar(512) not null default '',
@@ -80,6 +86,7 @@ create table article(
     status enum('draft', 'publish') not null default 'draft',
     for_first_page bool not null default 0,
     photo int unsigned,
+    
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -112,9 +119,11 @@ drop table if exists article_region;
 
 create table article_region(
     id int unsigned not null primary key auto_increment,
+    
     article_id int unsigned not null,
     region_id int unsigned not null,
     registered datetime not null,
+    
     unique key article_region(article_id, region_id)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
@@ -128,9 +137,11 @@ drop table if exists comment;
 
 create table comment(
     id int unsigned not null primary key auto_increment,
+    
     article_id int unsigned not null default 0 comment 'link to article.id',
     user_id int unsigned not null default 0 comment 'link to user.id',
     body text comment 'body of comment',
+    
     registered datetime not null,
     changed datetime
 ) CHARACTER SET utf8 COLLATE utf8_bin;
@@ -146,21 +157,74 @@ insert into comment(article_id, user_id, body, registered) values(2, 1, 'comment
 
 
 
-drop table if exists doc;
 
-create table doc(
+
+
+
+drop table if exists portal;
+
+create table portal(
     id int unsigned not null primary key auto_increment,
-    user_id int unsigned not null default 0,
     title varchar(1024) not null default '',
+    domain varchar(64) not null default '',
+    
+    logo int unsigned,
     body text,
-    status enum('draft', 'publish') not null default 'draft',
+    status enum('online', 'offline') not null default 'offline',
+    
     registered datetime not null,
-    changed datetime
+    changed datetime,
+    
+    unique key domain( domain)
 ) CHARACTER SET utf8 COLLATE utf8_bin;
 
+insert into portal(title, domain, registered) values('Социальные услуги', 'social.tld', now());
+insert into portal(title, domain, registered) values('Асоциальные услуги', 'asocial.tld', now());
+insert into portal(title, domain, registered) values('Другие услуги', 'other.tld', now());
+
+
+drop table if exists clientsite;
+
+create table clientsite(
+    id int unsigned not null primary key auto_increment,
+    portal_id int unsigned not null default 0,
+    
+    title varchar(1024) not null default '',
+    domain varchar(64) not null default '',
+    
+    logo int unsigned,
+    body text,
+    status enum('online', 'offline') not null default 'offline',
+    
+    registered datetime not null,
+    changed datetime,
+    
+    unique key portal_domain(portal_id, domain)
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+insert into clientsite(portal_id, title, domain, registered) values(1, 'Соц 1', 'soc1', now());
+insert into clientsite(portal_id, title, domain, registered) values(2, 'Асоциальный 1', 'zzz', now());
 
 
 
+drop table if exists page;
+
+create table page(
+    id int unsigned not null primary key auto_increment,
+    portal_id int unsigned not null default 0,
+    clientsite_id int unsigned not null default 0,
+    
+    title varchar(1024) not null default '',
+    url varchar(128) not null default '',
+    
+    body text,
+    status enum('online', 'offline') not null default 'offline',
+    
+    registered datetime not null,
+    changed datetime,
+    
+    unique key portal_clientsite_url(portal_id, clientsite_id, url)
+) CHARACTER SET utf8 COLLATE utf8_bin;
 
 
 
@@ -193,6 +257,23 @@ create table uploadfile(
     height int unsigned not null default 0,
     size int unsigned not null default 0,
     md5 varchar(32) not null default '',
+    
+    registered datetime not null,
+    changed datetime
+) CHARACTER SET utf8 COLLATE utf8_bin;
+
+
+
+
+drop table if exists doc;
+
+create table doc(
+    id int unsigned not null primary key auto_increment,
+    
+    user_id int unsigned not null default 0,
+    title varchar(1024) not null default '',
+    body text,
+    status enum('draft', 'publish') not null default 'draft',
     
     registered datetime not null,
     changed datetime

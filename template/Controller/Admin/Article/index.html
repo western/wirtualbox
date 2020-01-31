@@ -36,6 +36,7 @@
                 <tr>
                     <th scope="col">id</th>
                     <th scope="col">Заголовок</th>
+                    <th scope="col">Фото</th>
                     <th scope="col">Статус</th>
                     <th scope="col">Статья</th>
                     <th scope="col">Показывать на главной странице</th>
@@ -56,6 +57,7 @@
                         wb.make_tr('<TMPL_VAR row>', [
                             {name: 'id', type: 'label'},
                             {name: 'title', type: 'edit', label: 'Заголовок', edit_link: '/admin/article/:id/edit'},
+                            {name: 'photo', type: 'file', label: 'Фото', model: 'Uploadfile'},
                             {name: 'status', type: 'enum', label: 'Статус', option: [['draft', 'Draft'], ['publish', 'Publish']]},
                             {name: 'body', type: 'wysiwyg', label: 'Статья'},
                             {name: 'for_first_page', type: 'checkbox', value_chk: 1, label: 'Показывать на главной странице'},
@@ -75,7 +77,9 @@
         <p>
             All count: <TMPL_VAR NAME=list_count>
         </p>
-        
+    </div>
+    
+    <div class="row">
         <ul class="pagination" ></ul>
     </div>
     
