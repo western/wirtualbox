@@ -51,9 +51,7 @@ sub edit {
     my($self, $r, $args) = @_;
     
     
-    my $data = $r->model->Article->join('left uploadfile as artphoto')->where('article.id' => $args->{id})->list( -flat=>1, -json=>1 )->[0];
-    
-    #die dumper $data;
+    my $data = $r->model->Article->where('article.id' => $args->{id})->list( -flat=>1, -json=>1 )->[0];
     
     if( !$data ){
         return $r->response->template404(
@@ -86,7 +84,7 @@ sub new {
 
 sub create {
     my($self, $r, $args) = @_;
-    my @fields = qw(title status body region_id);
+    my @fields = qw(title status body);
     
     for my $n (@fields){
         
@@ -96,25 +94,11 @@ sub create {
         ) if ( !$r->param($n) );
     }
     
-    my $uploadfile;
-    if( my $photo = $r->param('photo') ){
-        
-        $photo->upload_to(
-            full_path => $r->{env}{root}.'/htdocs/file/'.$photo->filename,
-        );
-        
-        $uploadfile = $r->model->Uploadfile->insert(
-            model      => 'article',
-            path       => '/file/'.$photo->filename,
-            filename   => $photo->filename,
-            ext        => $photo->ext,
-            width      => $photo->width,
-            height     => $photo->height,
-            size       => $photo->size,
-            md5        => $photo->md5,
-            registered => current_sql_datetime,
-        );
-    }
+    my $uploadfile = $r->upload_file(
+        param => 'photo',
+        model => 'article',
+    );
+    
     
     my $id = $r->param('id');
     if( $id ){
@@ -125,6 +109,7 @@ sub create {
         
         my %r = map { $_ => $r->param($_) } @fields;
         $r{for_first_page} = $r->param('for_first_page') || 0;
+        $r{region_id}      = $r->param('region_id') || 0;
         $r{changed}        = current_sql_datetime;
         $r{photo}          = $uploadfile->{id} if ($uploadfile);
         
@@ -134,6 +119,7 @@ sub create {
         
         my %r = map { $_ => $r->param($_) } @fields;
         $r{for_first_page} = $r->param('for_first_page') || 0;
+        $r{region_id}      = $r->param('region_id') || 0;
         $r{user_id}        = 1;
         $r{registered}     = current_sql_datetime;
         $r{photo}          = $uploadfile->{id} if ($uploadfile);

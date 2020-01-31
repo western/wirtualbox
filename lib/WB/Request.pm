@@ -8,8 +8,9 @@ use HTTP::Entity::Parser;
 use Cookie::Baker ();
 use JSON::XS;
 use Crypt::CBC;
+use File::Path qw(make_path);
 
-use WB::Util qw(dumper url_unescape decode);
+use WB::Util qw(dumper url_unescape decode current_sql_datetime);
 use WB::File;
 
 
@@ -19,8 +20,9 @@ sub new{
     my %arg = @_;
     
     my $self = {
-        env => {},
+        env     => {},
         charset => 'UTF-8',
+        
         %arg,
     };
     
@@ -129,7 +131,7 @@ sub _param_parse{
                 push @b, $args[1][$i];
                 push @b, new WB::File(
                     filename => $ar->{filename},
-                    size => $ar->{size},
+                    size     => $ar->{size},
                     tempname => $ar->{tempname},
                 );
             }
@@ -191,6 +193,59 @@ sub cookie{
     }
     
     $ret;
+}
+
+=head2 upload_file
+    
+    Universal upload method for Uploadfile model
+    
+    my $uploadfile = $r->upload_file(
+        param => 'photo',
+        model => 'article',
+    );
+    
+=cut
+sub upload_file{
+    my $self = shift;
+    my %arg  = @_;
+    
+    my $param = $arg{param};
+    my $model = $arg{model};
+    
+    my $uploadfile;
+    if( my $uobj = $self->param($param) ){
+        
+        my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+        $mon  ++;
+        $year += 1900;
+        $mon  = "0$mon"  if( length($mon)<2 );
+        $mday = "0$mday" if( length($mday)<2 );
+        
+        my $path          = $self->{env}{root}.'/htdocs/file/'.$model.'/'.$year.'/'.$mon.'/'.$mday;
+        my $relative_path = '/file/'.$model.'/'.$year.'/'.$mon.'/'.$mday;
+        
+        if( !-d $path ){
+            make_path($path);
+        }
+        
+        $uobj->upload_to(
+            full_path => $path.'/'.$uobj->filename,
+        );
+        
+        $uploadfile = $self->model->Uploadfile->insert(
+            model      => $model,
+            path       => $relative_path.'/'.$uobj->filename,
+            filename   => $uobj->filename,
+            ext        => $uobj->ext,
+            width      => $uobj->width,
+            height     => $uobj->height,
+            size       => $uobj->size,
+            md5        => $uobj->md5,
+            registered => current_sql_datetime,
+        );
+    }
+    
+    $uploadfile;
 }
 
 1;

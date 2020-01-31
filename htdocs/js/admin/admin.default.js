@@ -21,7 +21,7 @@ if( typeof(wb) == "undefined" )
         return n.charAt(0).toUpperCase() + n.slice(1);
     };
     
-    wb.form_build = function(data, control, whereto){
+    wb.form_build = function(data, model, control, whereto){
         
         if ( data != '' ) {
             data = data.replace(/&apos;/g, "'");
@@ -191,7 +191,7 @@ if( typeof(wb) == "undefined" )
                     });
                     
                     setTimeout(function(){
-                        location.href = '/admin/article/'+data.id+'/edit';
+                        location.href = '/admin/'+model+'/'+data.id+'/edit';
                     }, 1500);
                     
                 }else{

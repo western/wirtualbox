@@ -21,7 +21,7 @@
         <form class="col-md-12" id="form1" method="post" action="/admin/article">
             
             <script>
-                wb.form_build('<TMPL_VAR data>', [
+                wb.form_build('<TMPL_VAR data>', 'article', [
                     {name: 'id', type: 'hidden'},
                     {name: 'title', type: 'edit', label: 'Заголовок', note: 'Краткое описание статьи'},
                     {name: 'status', type: 'enum', label: 'Статус', option: [['draft', 'Draft'], ['publish', 'Publish']]},
