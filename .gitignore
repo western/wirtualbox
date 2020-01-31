@@ -1,6 +1,5 @@
-htdocs/bootstrap-4.3.1-dist.zip
-htdocs/bootstrap-4.3.1-dist/
-htdocs/fontawesome-free-5.12.0-web/
-htdocs/file/*
-htdocs/tinymce_5.1.6/
-htdocs/tinymce_5.1.6_dev/
+htdocs/css/bootstrap-4.3.1-dist/
+htdocs/css/fontawesome-free-5.12.0-web/
+htdocs/js/tinymce_5.1.6/
+htdocs/js/tinymce_5.1.6_dev/
+htdocs/file/

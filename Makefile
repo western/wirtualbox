@@ -13,7 +13,7 @@ run:
 kill:
 	kill -9 `cat /tmp/wb.pid` ; rm /tmp/wb.log
 bootstrap:
-	cd htdocs ; \
+	cd htdocs/css ; \
 	rm bootstrap-4.3.1-dist.zip ; \
 	wget -O bootstrap-4.3.1-dist.zip https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip && \
 	unzip bootstrap-4.3.1-dist.zip && \
@@ -31,11 +31,11 @@ vuejs:
 	rm vue.min.js ; \
 	wget -O vue.min.js https://vuejs.org/js/vue.min.js
 fontawesome:
-	cd htdocs ; \
+	cd htdocs/css ; \
 	rm -rf fontawesome-free-5.12.0-web ; \
 	wget https://use.fontawesome.com/releases/v5.12.0/fontawesome-free-5.12.0-web.zip && unzip fontawesome-free-5.12.0-web.zip && rm fontawesome-free-5.12.0-web.zip
 tinymce:
-	cd htdocs ; \
+	cd htdocs/js ; \
 	wget https://download.tiny.cloud/tinymce/community/tinymce_5.1.6_dev.zip && unzip tinymce_5.1.6_dev.zip && \
 	mv tinymce tinymce_5.1.6_dev && rm tinymce_5.1.6_dev.zip ; \
 	wget https://download.tiny.cloud/tinymce/community/tinymce_5.1.6.zip && unzip tinymce_5.1.6.zip && \
