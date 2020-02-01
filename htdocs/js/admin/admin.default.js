@@ -68,7 +68,7 @@ if( typeof(wb) == "undefined" )
                 var inp = $('<input type="file" id="'+id+'" name="'+c.name+'" >');
                 wrap.append(label);
                 wrap.append(inp);
-                if( d_value != '' ){
+                if( d_value != undefined && d_value != '' ){
                     
                     if( 'model' in c ){
                         $.ajax({
@@ -273,7 +273,7 @@ if( typeof(wb) == "undefined" )
                 
                 var td = $('<td></td>');
                 
-                if( d.value != '' ){
+                if( d.value != undefined && d.value != '' ){
                     
                     if( 'model' in c ){
                         $.ajax({
