@@ -383,6 +383,9 @@ sub _get_join_options {
 sub _reset {
     my $self = shift;
     
+    $self->{fields} = [];
+    $self->_fields_from_table( $self->{table_name} );
+    
     $self->{where} = $self->{where_arg} = undef;
     $self->{join} = $self->{gain} = [];
     $self->{limit} = $self->{offset} = $self->{orderby} = undef;

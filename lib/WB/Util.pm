@@ -21,6 +21,7 @@ our @EXPORT_OK = (
     qw(dumper current_sql_datetime required template_layout),
     qw(encode_json decode_json),
     qw(println_red println_yellow println_white println_green println_blue println_magenta println_cyan),
+    qw(string_random),
 );
 
 our %EXPORT_TAGS = (
@@ -28,6 +29,7 @@ our %EXPORT_TAGS = (
         dumper current_sql_datetime required template_layout
         encode_json decode_json
         println_red println_yellow println_white println_green println_blue println_magenta println_cyan
+        string_random
     )]
 );
 
@@ -101,11 +103,11 @@ sub url_unescape {
     return $str;
 }
 
-sub dumper{
+sub dumper {
     Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
 }
 
-sub current_sql_datetime{
+sub current_sql_datetime {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
     
     $mon  ++;
@@ -118,6 +120,16 @@ sub current_sql_datetime{
     $sec  = "0$sec"  if( length($sec) <2 );
     
     "$year-$mon-$mday $hour:$min:$sec";
+}
+
+sub string_random {
+    my $length = shift;
+    
+    my @chars = ('A'..'Z', 'a'..'z', '0'..'9');
+    my $str;
+    $str .= $chars[rand @chars] for 1..$length;
+    
+    $str;
 }
 
 sub required{ }

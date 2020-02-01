@@ -1,6 +1,6 @@
 
 
-use Test::More tests => 3;
+use Test::More tests => 5;
 use Cwd;
 
 use lib 'lib';
@@ -28,13 +28,17 @@ my $row = $model->Article->limit(1)->list->[0];
 my @fields = keys %$row;
 ok( scalar @fields == 10, 'test 1' );
 
-
 $row = $model->Article->join('user')->limit(1)->list->[0];
 @fields = keys %$row;
 ok( scalar @fields == 17, 'test 2' );
 
-
 $row = $model->Article->join('user')->join('region')->limit(1)->list->[0];
 @fields = keys %$row;
 ok( scalar @fields == 19, 'test 3' );
+
+$row = $model->Article->where(id=>2)->limit(1)->list( -data=>1 )->[0];
+ok( $row->{title} eq 'title2', 'test 4' );
+
+$row = $model->Article->where(id=>2)->limit(1)->list( -data=>1, -json=>1 )->[0];
+ok( $row && $row =~ /body2/ && $row =~ /title2/, 'test 5' );
 

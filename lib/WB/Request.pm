@@ -10,7 +10,7 @@ use JSON::XS;
 use Crypt::CBC;
 use File::Path qw(make_path);
 
-use WB::Util qw(dumper url_unescape decode current_sql_datetime);
+use WB::Util qw(dumper url_unescape decode current_sql_datetime string_random);
 use WB::File;
 
 
@@ -228,15 +228,17 @@ sub upload_file{
             make_path($path);
         }
         
+        my $fname = lc string_random(5).'.'.$uobj->ext;
+        
         $uobj->upload_to(
-            full_path => $path.'/'.$uobj->filename,
+            full_path => $path.'/'.$fname,
         );
         
         $uploadfile = $self->model->Uploadfile->insert(
             model      => $model,
-            path       => $relative_path.'/'.$uobj->filename,
-            filename   => $uobj->filename,
-            ext        => $uobj->ext,
+            path       => $relative_path.'/'.$fname,
+            filename   => $fname,
+            ext        => lc $uobj->ext,
             width      => $uobj->width,
             height     => $uobj->height,
             size       => $uobj->size,
