@@ -186,18 +186,7 @@ sub _sql_compile {
     $sql;
 }
 
-=head2 select
-    
-    select('table.field1')
-    
-sub select {
-    my $self = shift;
-    
-    push @{$self->{fields}}, @_;
-    
-    $self;
-}
-=cut
+
 
 =head2 where
     
@@ -271,13 +260,7 @@ sub offset {
     $self;
 }
 
-# sub gain {
-#     my $self = shift;
-#     
-#     push @{$self->{gain}}, @_;
-#     
-#     $self;
-# }
+
 
 
 =head2 join
@@ -287,23 +270,15 @@ sub offset {
     join( 'left outer users' )
     join( 'users' => 'users.id = article.user_id' )
     
-    join( 'users as persons' )
-    join( 'left users as persons' )
-    join( 'left outer users as persons' )
-    join( 'users as persons' => 'users.id = article.user_id' )
-    
 =cut
 sub join {
     my $self = shift;
     
-    my $table_without_alias = shift;
-    my $alias = '';
-    if( $table_without_alias =~ m! as (\w+)! ){
-        $alias = $1;
-        $table_without_alias =~ s! as (\w+)!!;
-    }
+    my $table_name = shift;
     
-    my @table_expect = split(/\s+/, $table_without_alias);
+    
+    
+    my @table_expect = split(/\s+/, $table_name);
     my $on_option    = shift;
     
     # join( 'left users' )
@@ -318,7 +293,6 @@ sub join {
         push @{$self->{join}}, {
             prefix => join(' ', @table_expect),
             table  => $table,
-            alias  => $alias,
             on     => $on_option ? $on_option : $self->_get_join_options( $table ),
         };
     } else {
@@ -331,7 +305,6 @@ sub join {
         push @{$self->{join}}, {
             prefix => 'inner',
             table  => $table_expect[0],
-            alias  => $alias,
             on     => $on_option ? $on_option : $self->_get_join_options( $table_expect[0] ),
         };
     }
@@ -380,13 +353,6 @@ sub list {
     
     
     
-#     my @fields = map {
-#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name}.' '.$_->{tablename}.'_'.$_->{name} : $_->{name}
-#     } @{$self->{fields}};
-#     
-#     my %fields = map {
-#         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name}.' '.$_->{tablename}.'_'.$_->{name} : $_->{name} => $_
-#     } @{$self->{fields}};
 
     my @fields = map {
         $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name}
@@ -419,33 +385,7 @@ sub list {
         push @$list2, $row2;
     }
     
-    # DEPRECATED?
-    # list( -gain=>1 )
-=head1    
-    for my $ga ( @{$self->{gain}} ) {
-        
-        # check
-        my $ga_assign = '';
-        my $ga_field = '';
-        for my $f (qw(belong_to has_many)){
-            for my $el ( @{$self->{$f}} ) {
-                my @t = split(/\./, $el->[1]);
-                
-                if( $ga eq $t[0] ){
-                    
-                    $ga_assign = "select * from $ga where $el->[1] = ? ";
-                    $ga_field  = $el->[0];
-                }
-            }
-        }
-        
-        # set for each row
-        for my $row ( @$list2 ) {
-            
-            $row->{$ga.'_raw_'} = $self->db->selectall_arrayref( $ga_assign, {Slice=>{}}, $row->{$ga_field}->value );
-        }
-    }
-=cut
+    
     
     # list( -data=>1 )
     # list( -data=>1, -json=>1 )
