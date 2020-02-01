@@ -20,25 +20,7 @@ use WB::Type::Enum;
 use WB::Type::Text;
 use WB::Type::Datetime;
 
-# An old cowboy went riding out one dark and windy day
-# Upon a ridge he rested as he went along his way
-# When all at once a mighty herd of red eyed cows he saw
-# A-plowing through the ragged sky and up the cloudy draw
-# 
-# Yippie yi ooh
-# Yippie yi yay
-# Ghost riders in the sky
-# 
-# Their brands were still on fire and their hooves were made of steel
-# Their horns were black and shiny and their hot breath he could feel
-# A bolt of fear went through him as they thundered through the sky
-# For he saw the riders coming hard and he heard their mournful cry
-# 
-# Yippie yi ooh
-# Yippie yi yay
-# Ghost riders in the sky
-
-
+our $VERSION = '0.1';
 
 our $storage = {};
 
