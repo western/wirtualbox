@@ -31,11 +31,20 @@ sub new {
     my %arg = @_;
     
     my $self = {
-        driver => undef,
-        db     => undef,
+        driver => undef, # 'mysql', 'postgres', etc
+        db     => undef, # DBI handler
         
         table_name   => undef,
         primary_name => undef, # primary key field name
+        
+        fields    => [], # array of WB::Type classes
+        where     => [],
+        where_arg => [],
+        join      => [],
+        
+        limit   => undef,
+        offset  => undef,
+        orderby => [],
         
         %arg
     };
@@ -160,7 +169,7 @@ sub _sql_compile {
     
     $sql .= "\n";
     
-    if ( $self->{where} ) {
+    if ( $self->{where} && scalar @{$self->{where}} ) {
         $sql .= 'where '.join(' and ', @{$self->{where}});
         $sql .= "\n";
     }
