@@ -376,7 +376,7 @@ sub _reset {
     $self->_fields_from_table( $self->{table_name} );
     
     $self->{where} = $self->{where_arg} = undef;
-    $self->{join}  = $self->{gain} = [];
+    $self->{join}  = [];
     $self->{limit} = $self->{offset} = $self->{orderby} = undef;
 }
 
