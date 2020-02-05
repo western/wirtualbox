@@ -20,7 +20,7 @@ use WB::Type::Enum;
 use WB::Type::Text;
 use WB::Type::Datetime;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 our $storage = {};
 
@@ -31,8 +31,9 @@ sub new {
     my %arg = @_;
     
     my $self = {
-        driver => undef, # 'mysql', 'postgres', etc
-        db     => undef, # DBI handler
+        driver   => undef, # 'mysql', 'postgres', etc
+        db       => undef, # DBI handler
+        is_debug => 0,
         
         table_name   => undef,
         primary_name => undef, # primary key field name
@@ -54,16 +55,30 @@ sub new {
     $self;
 }
 
+=head2 _set_db
+    
+    Set database driver name.
+    Called it from Model constructor
+    
+=cut
 sub _set_db {
     my $self = shift;
-    
-    $self->{driver}   = $self->{db}->{Driver}{Name};
+    $self->{driver} = $self->{db}->{Driver}{Name};
 }
 
 sub db {
     shift->{db};
 }
 
+=head2 _init
+    
+    - Set relations
+    - Set table_name
+    - Set fields
+    
+    Called it from Model constructor
+    
+=cut
 sub _init {
     my $self = shift;
     my $pack = ref $self;
@@ -77,7 +92,6 @@ sub _init {
     if ( $self->{driver} eq 'mysql' ) {
         
         $self->{fields} = [];
-        
         $self->_fields_from_table( $self->{table_name} );
     }
 }
@@ -137,37 +151,38 @@ sub _sql_compile {
     my $self = shift;
     my %arg = @_;
     
-    my $sql = "select ";
     
-    if ( $arg{is_count} ) {
+    
+    
+    my $sql = "from $self->{table_name} \n";
+    for my $j ( @{$self->{join}} ) {
         
-        $sql .= "count(*) cnt\n";
+        # prefix contain: left, inner, outer
+        $sql .= $j->{prefix}.' ' if ( $j->{prefix} );
         
-    } else {
-        if ( $self->{fields} ) {
+        if( $j->{alias} ){
+            
             for my $f ( @{$self->{fields}} ) {
-                
-                $sql .= $f->{name_full}.', ';
-                #$sql .= $f->{name_full}.' '.$f->{tablename}.'_'.$f->{name}.', ' if ( $f->{tablename} ne $self->{table_name} );
-                #$sql .= $f->{name_full}.', ' if ( $f->{tablename} eq $self->{table_name} );
+                $f->{alias} = $j->{alias} if ( $f->{tablename} eq $j->{table} );
             }
-            $sql =~ s!, $!!;
-            $sql .= "\n";
-        } else {
-            $sql .= "* \n";
+            
+            my $on = $j->{on};
+            $on =~ s!$j->{table}!$j->{alias}!g;
+            
+            $sql .= 'join '.$j->{table}.' '.$j->{alias}."\n";
+            $sql .= ' on '.$on."\n";
+        }else{
+            $sql .= 'join '.$j->{table}."\n";
+            $sql .= ' on '.$j->{on}."\n";
         }
     }
     
-    $sql .= "from $self->{table_name} \n";
     
-    for my $j ( @{$self->{join}} ) {
-        # prefix contain: left, inner, outer
-        $sql .= $j->{prefix}.' ' if ( $j->{prefix} );
-        $sql .= 'join '.$j->{table}."\n";
-        $sql .= ' on '.$j->{on}."\n";
-    }
+    
+    
     
     $sql .= "\n";
+    
     
     if ( $self->{where} && scalar @{$self->{where}} ) {
         $sql .= 'where '.join(' and ', @{$self->{where}});
@@ -190,7 +205,7 @@ sub _sql_compile {
         $sql .= " offset $self->{offset} " if (defined $self->{offset});
     }
     
-    println_green( 'ModelCore::', "_sql_compile= ", $sql );
+    println_green( 'ModelCore::', '_sql_compile=', $sql ) if ($self->{is_debug});
     
     $sql;
 }
@@ -215,7 +230,7 @@ sub where {
     
     if( $arg_cnt > 1 && ($arg_cnt % 2) == 0 && $_[0] !~ /\s/ ){
         
-        println_green('ModelCore::', 'where :1');
+        println_green('ModelCore::', 'where :1') if ($self->{is_debug});
         
         while (my($name, $value) = splice(@_, 0, 2)) {
             if( ref $value eq 'ARRAY' ){
@@ -231,7 +246,7 @@ sub where {
         
     }elsif( $arg_cnt > 1 && $_[0] =~ /\s/ ){
         
-        println_green('ModelCore::', 'where :2');
+        println_green('ModelCore::', 'where :2') if ($self->{is_debug});
         
         # where( 'name like ?', 'first%' )
         # where( 'name like ? or title like ?', 'first%', 'second%' )
@@ -241,7 +256,7 @@ sub where {
         
     }elsif( $arg_cnt == 1 && $_[0] =~ /\s/ ){
         
-        println_green('ModelCore::', 'where :3');
+        println_green('ModelCore::', 'where :3') if ($self->{is_debug});
         
         # where( 'id = 99' )
         
@@ -298,11 +313,13 @@ sub join {
         my $table = pop @table_expect;
         
         $self->_fields_from_table( $table );
+        my $get_join_options = $self->_get_join_options( $table );
         
         push @{$self->{join}}, {
             prefix => join(' ', @table_expect),
             table  => $table,
-            on     => $on_option ? $on_option : $self->_get_join_options( $table ),
+            on     => $on_option ? $on_option : $get_join_options->{on},
+            alias  => $get_join_options->{alias},
         };
     } else {
         
@@ -310,15 +327,17 @@ sub join {
         # join( 'users' => 'users.id = article.user_id' )
         
         $self->_fields_from_table( $table_expect[0] );
+        my $get_join_options = $self->_get_join_options( $table_expect[0] );
         
         push @{$self->{join}}, {
             prefix => 'inner',
             table  => $table_expect[0],
-            on     => $on_option ? $on_option : $self->_get_join_options( $table_expect[0] ),
+            on     => $on_option ? $on_option : $get_join_options->{on},
+            alias  => $get_join_options->{alias},
         };
     }
     
-    #warn '$self->{join}= '.dumper $self->{join};
+    #warn '$self->{join}= '.dumper($self->{join}) if ($self->{is_debug});
     
     
     $self;
@@ -332,14 +351,20 @@ sub _get_join_options {
     for my $el ( @{$self->{belong_to}} ) {
         my @t = split(/\./, $el->[1]);
         if( $table eq $t[0] ){
-            return $self->{table_name}.'.'.$el->[0].' = '.$el->[1];
+            return {
+                on    => $self->{table_name}.'.'.$el->[0].' = '.$el->[1],
+                alias => $el->[2]->{alias},
+            };
         }
     }
     
     for my $el ( @{$self->{has_many}} ) {
         my @t = split(/\./, $el->[1]);
         if( $table eq $t[0] ){
-            return $self->{table_name}.'.'.$el->[0].' = '.$el->[1];
+            return {
+                on    => $self->{table_name}.'.'.$el->[0].' = '.$el->[1],
+                alias => $el->[2]->{alias},
+            };
         }
     }
 }
@@ -351,7 +376,7 @@ sub _reset {
     $self->_fields_from_table( $self->{table_name} );
     
     $self->{where} = $self->{where_arg} = undef;
-    $self->{join} = $self->{gain} = [];
+    $self->{join}  = $self->{gain} = [];
     $self->{limit} = $self->{offset} = $self->{orderby} = undef;
 }
 
@@ -362,26 +387,48 @@ sub list {
     
     
     
+    
+    
+    
+    
+    
+    my $sql = $self->_sql_compile;
+    
+    
+    
 
+    
     my @fields = map {
-        $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name}
+        ($_->{alias} || $_->{tablename}).'.'.$_->{name}
     } @{$self->{fields}};
     
     my %fields = map {
-        $_->{tablename} ne $self->{table_name} ? $_->{tablename}.'.'.$_->{name} : $_->{name} => $_
+        ($_->{alias} || $_->{tablename}).'.'.$_->{name} => $_
     } @{$self->{fields}};
     
     
-    # @fields has contain:
-    # [
-    #   "id", "user_id", "title", "body", "registered", "changed",
-    #   "users.id", "users.login", "users.password", "users.name", "users.registered", "users.changed"
-    # ]
+    
+    
+    $sql = 'select '.CORE::join(', ', @fields)."\n".$sql;
+    warn '[['.$sql.']]' if ($self->{is_debug});
+    
+    
+    
+    
+    @fields = map {
+        $_->{tablename} eq $self->{table_name} ? $_->{name} : ($_->{alias} || $_->{tablename}).'.'.$_->{name}
+    } @{$self->{fields}};
+    
+    %fields = map {
+        $_->{tablename} eq $self->{table_name} ? $_->{name} : ($_->{alias} || $_->{tablename}).'.'.$_->{name} => $_
+    } @{$self->{fields}};
+    
+    
+    
     
     my $list2;
     
-    
-    my $list = $self->db->selectall_arrayref( $self->_sql_compile, undef, @{$self->{where_arg}} );
+    my $list = $self->db->selectall_arrayref( $sql, undef, @{$self->{where_arg}} );
     for my $row ( @$list ) {
         my $row2 = {};
         for ( my $i=0; $i<scalar @fields; $i++ ) {
@@ -495,13 +542,27 @@ sub list {
 sub count {
     my $self = shift;
     
-    my $data = $self->db->selectrow_hashref( $self->_sql_compile(is_count => 1), undef, @{$self->{where_arg}} );
+    my $data = $self->db->selectrow_hashref( 'select count(*) cnt '.$self->_sql_compile, undef, @{$self->{where_arg}} );
     
     $self->_reset;
     
     $data->{cnt};
 }
 
+=head2 insert
+    
+    my %r = map { $_ => $r->param($_) } @fields;
+    $r{for_first_page} = $r->param('for_first_page') || 0;
+    $r{region_id}      = $r->param('region_id') || 0;
+    $r{user_id}        = 1;
+    $r{registered}     = current_sql_datetime;
+    $r{photo}          = $uploadfile->{id} if ($uploadfile);
+    
+    my $article = $r->model->Article->insert( %r );
+    
+    Return hash of inserted row.
+    
+=cut
 sub insert {
     my $self = shift;
     my %arg  = @_;
@@ -521,6 +582,20 @@ sub insert {
     }
 }
 
+=head2 update
+    
+    my %r = map { $_ => $r->param($_) } @fields;
+    $r{for_first_page} = $r->param('for_first_page') || 0;
+    $r{region_id}      = $r->param('region_id') || 0;
+    $r{changed}        = current_sql_datetime;
+    $r{photo}          = $uploadfile->{id} if ($uploadfile);
+    
+    $r->model->Article->where( id => $id )->update( %r );
+    
+    Returns the number of rows affected or undef on error.
+    A return value of -1 means the number of rows is not known, not applicable, or not available.
+    
+=cut
 sub update {
     my $self = shift;
     my %arg  = @_;
@@ -562,16 +637,38 @@ sub config {
     }
 }
 
+=head2 has_many
+    
+    Special sub for model relation init
+    
+    __PACKAGE__->has_many( id => 'comment.article_id' );
+    
+=cut
 sub has_many {
     my $package = shift;
     
-    push @{$WB::ModelCore::storage->{$package}->{has_many}}, \@_;
+    my $field       = shift; # id
+    my $table_field = shift; # comment.article_id
+    my $opt         = shift; # { alias => 'ph' }
+    
+    push @{$WB::ModelCore::storage->{$package}->{has_many}}, [$field, $table_field, $opt];
 }
 
+=head2 belong_to
+    
+    Special sub for model relation init
+    
+    __PACKAGE__->belong_to( photo => 'uploadfile.id', { alias => 'ph' } );
+    
+=cut
 sub belong_to {
     my $package = shift;
     
-    push @{$WB::ModelCore::storage->{$package}->{belong_to}}, \@_;
+    my $field       = shift; # photo
+    my $table_field = shift; # uploadfile.id
+    my $opt         = shift; # { alias => 'ph' }
+    
+    push @{$WB::ModelCore::storage->{$package}->{belong_to}}, [$field, $table_field, $opt];
 }
 
 1;

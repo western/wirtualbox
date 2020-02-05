@@ -6,17 +6,7 @@ use WB::Util qw(:def);
 
 use Cwd;
 
-# Get outta my way
-# I'm gettin' tired of you
-# There ain't no chance
-# Doin' what you wanna do
-# I've been down down down down down
-# Got to get my feet back on the ground
-# 
-# Lady double dealer
-# Get outta my way
-# Lady double dealer
-# You got nothing to say
+
 
 sub new {
     my $c = shift;
@@ -76,7 +66,6 @@ sub get_model {
     my $self = shift;
     my $name = shift;
     
-    #$self->{models}->{$name} or die "not found model [$name]";
     $self->{models}->{$name};
 }
 

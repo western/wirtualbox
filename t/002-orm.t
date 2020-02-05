@@ -1,6 +1,6 @@
 
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Cwd;
 
 use lib 'lib';
@@ -24,6 +24,8 @@ my $model = new WB::Model(
 
 
 
+
+
 my $row = $model->Article->limit(1)->list->[0];
 my @fields = keys %$row;
 ok( scalar @fields == 10, 'test 1' );
@@ -41,4 +43,12 @@ ok( $row->{title} eq 'title2', 'test 4' );
 
 $row = $model->Article->where(id=>2)->limit(1)->list( -data=>1, -json=>1 )->[0];
 ok( $row && $row =~ /body2/ && $row =~ /title2/, 'test 5' );
+
+$row = $model->Article->where('article.id'=>1)->join('uploadfile')->limit(1)->list( -data=>1 )->[0];
+ok( $row && $row->{'ph.filename'}, 'test 6 (Alias test)' );
+
+$row = $model->Article->count;
+ok( $row, 'test 7' );
+
+
 
