@@ -16,7 +16,7 @@ sub new{
     my %arg = @_;
     
     my $self = {
-        template_engine => 'Template',
+        template_engine => 'Template', # 'Template', 'HTML::Template', 'Text::Xslate'
         template_object => undef,
         template_layout => '',
         template_file   => '',
@@ -45,6 +45,13 @@ sub init{
         require HTML::Template;
         
         #$self->{template_object} = HTML::Template->new(filename  => 'template.tmpl');
+    }
+    
+    if( $self->{template_engine} eq 'Text::Xslate' ){
+        
+        require Text::Xslate;
+        
+        $self->{template_object} = Text::Xslate->new();
     }
 }
 
@@ -141,6 +148,18 @@ sub process{
             $to->param(%arg);
             $to->param(main => $main);
             $selfut = $to->output;
+        }else{
+            $selfut = $main;
+        }
+    }
+    
+    if( $to && $self->{template_engine} eq 'Text::Xslate' ){
+        
+        my $main = $to->render($self->{template_file}, \%arg);
+        
+        if( $self->{template_layout} && $self->{template_layout} ne 'none' ){
+            $arg{main} = $main;
+            $selfut = $to->render($self->{template_layout}, \%arg);
         }else{
             $selfut = $main;
         }
